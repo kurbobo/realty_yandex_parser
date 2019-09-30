@@ -1,6 +1,6 @@
 from selenium import webdriver
 from time import clock
-number_of_pages = 5
+number_of_pages = 1
 open('cian.txt','w').close()
 chrome_options = webdriver.ChromeOptions()
 prefs = {"profile.managed_default_content_settings.images": 2, 'disk-cache-size': 4096}
@@ -10,7 +10,8 @@ try:
 	with open('cian.txt', 'a', encoding='utf-8') as output_file:
 		browser = webdriver.Chrome(chrome_options=chrome_options)
 		browser.get("https://spb.cian.ru/kupit-kvartiru-1-komn-ili-2-komn/")
-		for page_num in range(2,number_of_pages):
+		for page_num in range(0,number_of_pages):
+			page_num+=1
 			print(page_num)
 			# Get the URL of next page to be parsed
 			try:
@@ -27,14 +28,15 @@ try:
 				browser.get(page_ad)
 				element_list = list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--header--2Ayiz')))
 				element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--description--10czU')))
-				element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--offer_card_page-main--1glTM a10a3f92e9--aside_banner--2FWCV')))
+				# element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--offer_card_page-main--1glTM a10a3f92e9--aside_banner--2FWCV')))
+				element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--section_divider--1zGrv')))
 				element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--offer_card_page-bti--2BrZ7')))
 				for text in element_list:
-					output_file.write(text)
+					output_file.write(text+ '\n')
+				output_file.write('-------------------------------------------------------------------------\n')
 			# Open next page with search results
 			browser.get(new_window_url)
 finally:
 	end = clock()
-	print('Parsing done in' + str(end - start) + ' seconds.')
+	print('Parsing done in ' + str(end - start) + ' seconds.')
 	browser.quit()
-
