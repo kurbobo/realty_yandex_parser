@@ -1,9 +1,14 @@
 from selenium import webdriver
-number_of_pages = 100
+from time import clock
+number_of_pages = 5
 open('cian.txt','w').close()
+chrome_options = webdriver.ChromeOptions()
+prefs = {"profile.managed_default_content_settings.images": 2, 'disk-cache-size': 4096}
+chrome_options.add_experimental_option("prefs", prefs)
+start = clock()
 try:
 	with open('cian.txt', 'a', encoding='utf-8') as output_file:
-		browser = webdriver.Firefox()
+		browser = webdriver.Chrome(chrome_options=chrome_options)
 		browser.get("https://spb.cian.ru/kupit-kvartiru-1-komn-ili-2-komn/")
 		for page_num in range(2,number_of_pages):
 			print(page_num)
@@ -29,5 +34,7 @@ try:
 			# Open next page with search results
 			browser.get(new_window_url)
 finally:
+	end = clock()
+	print('Parsing done in' + str(end - start) + ' seconds.')
 	browser.quit()
 
