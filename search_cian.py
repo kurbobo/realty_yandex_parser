@@ -1,5 +1,6 @@
 from selenium import webdriver
 from time import clock
+import re
 number_of_pages = 1
 open('cian.txt','w').close()
 chrome_options = webdriver.ChromeOptions()
@@ -28,12 +29,17 @@ try:
 				browser.get(page_ad)
 				element_list = list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--header--2Ayiz')))
 				element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--description--10czU')))
+				element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--price--1HD9F a10a3f92e9--price--residential--2ev_G')))
 				# element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--offer_card_page-main--1glTM a10a3f92e9--aside_banner--2FWCV')))
 				element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--section_divider--1zGrv')))
 				element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--offer_card_page-bti--2BrZ7')))
+				element_str = "".join(element_list)
 				for text in element_list:
 					output_file.write(text+ '\n')
 				output_file.write('-------------------------------------------------------------------------\n')
+				# element_dict = {'Number of flats':(re.search(r'\d+-комн.\s+квартира,\s+\d+,\d+',element_str).group(0))}
+				element_dict = {'Number of flats': re.search(r'\d+-комн.\s+квартира,\s+\d+,?\d*',element_str).group(0)}
+				print(element_dict)
 			# Open next page with search results
 			browser.get(new_window_url)
 finally:
