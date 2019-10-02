@@ -7,6 +7,28 @@ chrome_options = webdriver.ChromeOptions()
 prefs = {"profile.managed_default_content_settings.images": 2, 'disk-cache-size': 4096}
 chrome_options.add_experimental_option("prefs", prefs)
 start = clock()
+def housing_complex_parser(flat_string):
+	reg_for_hc = r'в\s+ЖК\s+«\w+\s*\w*»'
+	if bool(re.search(reg_for_hc, flat_string))==False:
+		housing_complex = None
+	else: housing_complex = re.search(reg_for_hc , flat_string).group(0).split('«')[1].split('»')[0]
+	return housing_complex
+def amount_and_square_parser(flat_string):
+	string_with_amount_and_square = re.search(r'\d+-комн.\s+квартира,\s+\d+,?\d*', flat_string).group(0)
+	amount_of_rooms, total_square = re.findall('\s*\d+,?\d*', string_with_amount_and_square)
+	return int(amount_of_rooms), float(total_square.replace(',', '.'))
+def living_area_parser(flat_string):
+	reg_for_liv_ar = re.search(r'\d+,?\d*\s+\w+\sЖилая', flat_string)
+	if bool(reg_for_liv_ar)==False:
+		living_area = None
+	else:
+		living_area = reg_for_liv_ar.group(0).split()[0]
+	return living_area
+def parser(flat_string):
+	amount_of_rooms, total_square = amount_and_square_parser(flat_string)
+	element_dict = {'Number of flats': amount_of_rooms, 'total_area': total_square, 
+	'housing complex': housing_complex_parser(flat_string), 'living_area':living_area_parser(flat_string)}
+	return element_dict
 try:
 	with open('cian.txt', 'a', encoding='utf-8') as output_file:
 		browser = webdriver.Chrome(chrome_options=chrome_options)
@@ -38,8 +60,8 @@ try:
 					output_file.write(text+ '\n')
 				output_file.write('-------------------------------------------------------------------------\n')
 				# element_dict = {'Number of flats':(re.search(r'\d+-комн.\s+квартира,\s+\d+,\d+',element_str).group(0))}
-				element_dict = {'Number of flats': re.search(r'\d+-комн.\s+квартира,\s+\d+,?\d*',element_str).group(0)}
-				print(element_dict)
+				# print(element_str)
+				print(parser(element_str))
 			# Open next page with search results
 			browser.get(new_window_url)
 finally:
