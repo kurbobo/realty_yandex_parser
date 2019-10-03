@@ -1,4 +1,5 @@
 from selenium import webdriver
+import sqlite3
 from time import clock
 import pandas as pd
 from parser_tools import *
@@ -8,12 +9,15 @@ chrome_options = webdriver.ChromeOptions()
 prefs = {"profile.managed_default_content_settings.images": 2, 'disk-cache-size': 4096}
 chrome_options.add_experimental_option("prefs", prefs)
 info_list = []
+import sqlite3
+conn = sqlite3.connect('cian.db')
+cur = conn.cursor()
 start = clock()
 def parser(flat_string):
 	amount_of_rooms, total_square = amount_and_square_parser(flat_string)
 	storey_number, whole_storeys = storey_number_parser(flat_string)
 	total_price, price_per_sq_meter = price_parser(flat_string)
-	element_dict = {'Number of rooms': amount_of_rooms,'housing_complex': housing_complex_parser(flat_string),
+	element_dict = {'Number_of_rooms': amount_of_rooms,'housing_complex': housing_complex_parser(flat_string),
 	 'total_area': total_square, 'living_area':living_area_parser(flat_string),
 	'kitchen_area': kitchen_area_parser(flat_string), 'storey_number': storey_number, 'whole_storey_number': whole_storeys,
 	'Building_year': building_year_parser(flat_string), 'total_price': int(total_price), 'price_per_sq_meter':int(price_per_sq_meter),
@@ -48,8 +52,13 @@ try:
 				for text in element_list:
 					output_file.write(text+ '\n')
 				output_file.write('-------------------------------------------------------------------------\n')
-				info_list.append(parser(element_str))
-				print(parser(element_str))
+				info = parser(element_str)
+				columns = ', '.join(info.keys())
+				placeholders = ':'+', :'.join(info.keys())
+				query = 'INSERT INTO flats (%s) VALUES (%s)' % (columns, placeholders)
+				cur.execute(query, info)
+				info_list.append(info)
+				conn.commit()
 			# Open next page with search results
 			browser.get(new_window_url)
 except Exception as e: print(e)
@@ -58,4 +67,5 @@ finally:
 	df = pd.DataFrame(info_list)
 	df.to_csv('cian.csv', sep='\t',index=False)
 	print('Parsing done in ' + str(end - start) + ' seconds.')
+	conn.close()
 	browser.quit()
