@@ -39,6 +39,13 @@ def kitchen_area_parser(flat_string):
 		kitchen_area = reg_for_liv_ar.group(0).split()[0]
 		kitchen_area = float(kitchen_area.replace(',', '.'))
 	return kitchen_area
+def type_of_flat_parser(flat_string):
+	reg_for_type = re.search(r'Тип жилья\s+\w+', flat_string)
+	if bool(reg_for_type)==False:
+		type_of_flat = None
+	else:
+		type_of_flat = reg_for_type.group(0).split()[-1]
+	return type_of_flat
 def storey_number_parser(flat_string):
 	reg_for_liv_ar = re.search(r'\d+\s+из\s+\d+\s*Этаж', flat_string)
 	if bool(reg_for_liv_ar)==False:

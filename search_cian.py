@@ -13,11 +13,11 @@ def parser(flat_string):
 	amount_of_rooms, total_square = amount_and_square_parser(flat_string)
 	storey_number, whole_storeys = storey_number_parser(flat_string)
 	total_price, price_per_sq_meter = price_parser(flat_string)
-	element_dict = {'Number of rooms': amount_of_rooms, 'total_area': total_square, 
-	'housing_complex': housing_complex_parser(flat_string), 'living_area':living_area_parser(flat_string),
+	element_dict = {'Number of rooms': amount_of_rooms,'housing_complex': housing_complex_parser(flat_string),
+	 'total_area': total_square, 'living_area':living_area_parser(flat_string),
 	'kitchen_area': kitchen_area_parser(flat_string), 'storey_number': storey_number, 'whole_storey_number': whole_storeys,
 	'Building_year': building_year_parser(flat_string), 'total_price': int(total_price), 'price_per_sq_meter':int(price_per_sq_meter),
-	'address': address_parser(flat_string)}
+	'address': address_parser(flat_string), 'type_of_flat':type_of_flat_parser(flat_string)}
 	return element_dict
 try:
 	with open('cian.txt', 'a', encoding='utf-8') as output_file:
