@@ -13,16 +13,28 @@ import sqlite3
 conn = sqlite3.connect('cian.db')
 cur = conn.cursor()
 start = clock()
+
+
 def parser(flat_string):
 	amount_of_rooms, total_square = amount_and_square_parser(flat_string)
 	storey_number, whole_storeys = storey_number_parser(flat_string)
 	total_price, price_per_sq_meter = price_parser(flat_string)
+	bathroom_num, bathroom_separate = bathroom_parser(flat_string)
 	element_dict = {'Number_of_rooms': amount_of_rooms,'housing_complex': housing_complex_parser(flat_string),
 	 'total_area': total_square, 'living_area':living_area_parser(flat_string),
 	'kitchen_area': kitchen_area_parser(flat_string), 'storey_number': storey_number, 'whole_storey_number': whole_storeys,
 	'Building_year': building_year_parser(flat_string), 'total_price': int(total_price), 'price_per_sq_meter':int(price_per_sq_meter),
-	'address': address_parser(flat_string), 'type_of_flat':type_of_flat_parser(flat_string)}
+	'address': address_parser(flat_string), 'type_of_flat':type_of_flat_parser(flat_string),
+	'сeiling_height': seiling_hight_parser(flat_string), 'bathroom_number': bathroom_num,
+	'bathroom_separated': bathroom_separate, 'windows_to_street': windows_to_street_parser(flat_string),
+	'house_type': house_type_parser(flat_string), 'ceiling_type': ceiling_type_parser(flat_string),
+	'porch_num': porch_num_parser(flat_string), 'central_heating': central_heating_parser(flat_string),
+	'elevator_service': elevator_service_parser(flat_string), 'elevator_passangers': elevator_passangers_parser(flat_string),
+	'emergency_condition': emergency_condition_parser(flat_string), 'room1_square': room1_square_parser(flat_string),
+	'room2_square': room2_square_parser(flat_string), 'room3_square': room3_square_parser(flat_string),}
 	return element_dict
+
+
 try:
 	with open('cian.txt', 'a', encoding='utf-8') as output_file:
 		browser = webdriver.Chrome(chrome_options=chrome_options)
@@ -62,6 +74,7 @@ try:
 			# Open next page with search results
 			browser.get(new_window_url)
 except Exception as e: print(e)
+
 finally:
 	end = clock()
 	df = pd.DataFrame(info_list)
