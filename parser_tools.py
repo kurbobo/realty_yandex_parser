@@ -184,24 +184,24 @@ def room1_square_parser(flat_string):
 
 
 def room2_square_parser(flat_string):
-	reg_for_room2_square = re.search(r'Площадь комнат\s+\w+\s+\w+', flat_string)
+	reg_for_room2_square = re.search(r'Площадь комнат\s+\w+.*', flat_string)
 	if bool(reg_for_room2_square)==False:
 		room2_square = None
 	else:
 		try:
-			room2_square = float(reg_for_room2_square.group(0).split('-')[1])
+			room2_square = float(reg_for_room2_square.group(0).split('-')[1].split()[0])
 		except:
 			room2_square = None
 	return room2_square
 
 
 def room3_square_parser(flat_string):
-	reg_for_room3_square = re.search(r'Площадь комнат\s+\w+', flat_string)
+	reg_for_room3_square = re.search(r'Площадь комнат\s+\w+.*', flat_string)
 	if bool(reg_for_room3_square)==False:
 		room3_square = None
 	else:
 		try:
-			room3_square = float(reg_for_room3_square.group(0).split('-')[2])
+			room3_square = float(reg_for_room3_square.group(0).split('-')[2].split()[0])
 		except:
 			room3_square = None
 	return room3_square
