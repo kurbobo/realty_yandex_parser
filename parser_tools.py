@@ -1,5 +1,5 @@
 import re
-
+from geopy.geocoders import Nominatim
 def housing_complex_parser(flat_string):
 	reg_for_hc = r'в\s+ЖК\s+«(\w+\s*\w*)+»'
 	if bool(re.search(reg_for_hc, flat_string))==False:
@@ -218,3 +218,22 @@ def id_num_parser(flat_string):
 		id_num = int(reg_for_id_num.group(0).split()[-1])
 	return id_num
 
+
+def latitude(string):
+	nom = Nominatim()
+	n = nom.geocode(string)
+	print(string)
+	if n is None:
+		return None
+	else:
+		return n.latitude
+
+
+def longitude(string):
+	nom = Nominatim()
+	n = nom.geocode(string)
+	print(string)
+	if n is None:
+		return None
+	else:
+		return n.longitude

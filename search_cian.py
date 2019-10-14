@@ -9,7 +9,6 @@ chrome_options = webdriver.ChromeOptions()
 prefs = {"profile.managed_default_content_settings.images": 2, 'disk-cache-size': 4096}
 chrome_options.add_experimental_option("prefs", prefs)
 info_list = []
-import sqlite3
 conn = sqlite3.connect('cian.db')
 cur = conn.cursor()
 start = clock()
@@ -21,6 +20,7 @@ def parser(flat_string):
 	total_price, price_per_sq_meter = price_parser(flat_string)
 	bathroom_num, bathroom_separate = bathroom_parser(flat_string)
 	city, district,  municipal, street, building = address_parser(flat_string)
+	print(city + ',' + district + ',' +  municipal + ',' + street + ',' + building)
 	element_dict = {'id': id_num_parser(flat_string), 'Number_of_rooms': amount_of_rooms,'housing_complex': housing_complex_parser(flat_string),
 	 'total_area': total_square, 'living_area':living_area_parser(flat_string),
 	'kitchen_area': kitchen_area_parser(flat_string), 'storey_number': storey_number, 'whole_storey_number': whole_storeys,
@@ -34,7 +34,9 @@ def parser(flat_string):
 	'porch_num': porch_num_parser(flat_string), 'central_heating': central_heating_parser(flat_string),
 	'elevator_service': elevator_service_parser(flat_string), 'elevator_passangers': elevator_passangers_parser(flat_string),
 	'emergency_condition': emergency_condition_parser(flat_string), 'room1_square': room1_square_parser(flat_string),
-	'room2_square': room2_square_parser(flat_string), 'room3_square': room3_square_parser(flat_string),}
+	'room2_square': room2_square_parser(flat_string), 'room3_square': room3_square_parser(flat_string), 
+	'latitude': latitude(city + ',' + district + ',' +  municipal + ',' + street + ',' + building),
+	'longitude': longitude(city + ',' + district + ',' +  municipal + ',' + street + ',' + building)}
 	return element_dict
 
 
@@ -54,7 +56,7 @@ try:
 			# Get URLs of all current ads for parsing
 			ads_on_page = list(map(lambda x: x.get_attribute("href"), browser.find_elements_by_xpath(
 				'//a[@class="link_component-link-xUBVR4w6" and text()="Подробнее"]')))
-			# Open every ad to find more info
+			# Open every ad to find more info_dict
 			# TODO: find more appropriate css selectors for more accurate parsing
 			for page_ad in ads_on_page:
 				browser.get(page_ad)
@@ -74,12 +76,13 @@ try:
 				for text in element_list:
 					output_file.write(text+ '\n')
 				output_file.write('-------------------------------------------------------------------------\n')
-				info = parser(element_str)
-				columns = ', '.join(info.keys())
-				placeholders = ':'+', :'.join(info.keys())
+				info_dict = parser(element_str)
+				# print(info_dict.keys())
+				columns = ', '.join(info_dict.keys())
+				placeholders = ':'+', :'.join(info_dict.keys())
 				query = 'INSERT INTO flats (%s) VALUES (%s)' % (columns, placeholders)
-				cur.execute(query, info)
-				info_list.append(info)
+				cur.execute(query, info_dict)
+				info_list.append(info_dict)
 				conn.commit()
 			# Open next page with search results
 			browser.get(new_window_url)
