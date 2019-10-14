@@ -205,3 +205,12 @@ def room3_square_parser(flat_string):
 		except:
 			room3_square = None
 	return room3_square
+
+
+def id_num_parser(flat_string):
+	reg_for_id_num = re.search(r'ID_num:\s+\w+.*', flat_string)
+	if bool(reg_for_id_num)==False:
+		id_num = None
+	else:
+		id_num = int(reg_for_id_num.group(0).split()[-1])
+	return id_num

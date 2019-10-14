@@ -20,7 +20,7 @@ def parser(flat_string):
 	storey_number, whole_storeys = storey_number_parser(flat_string)
 	total_price, price_per_sq_meter = price_parser(flat_string)
 	bathroom_num, bathroom_separate = bathroom_parser(flat_string)
-	element_dict = {'Number_of_rooms': amount_of_rooms,'housing_complex': housing_complex_parser(flat_string),
+	element_dict = {'id': id_num_parser(flat_string), 'Number_of_rooms': amount_of_rooms,'housing_complex': housing_complex_parser(flat_string),
 	 'total_area': total_square, 'living_area':living_area_parser(flat_string),
 	'kitchen_area': kitchen_area_parser(flat_string), 'storey_number': storey_number, 'whole_storey_number': whole_storeys,
 	'Building_year': building_year_parser(flat_string), 'total_price': int(total_price), 'price_per_sq_meter':int(price_per_sq_meter),
@@ -61,7 +61,10 @@ try:
 				element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--section_divider--1zGrv')))
 				element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--offer_card_page-main--1glTM a10a3f92e9--aside_banner--2FWCV')))
 				element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--offer_card_page-bti--2BrZ7')))
+				element_list += ["ID_num: " + str(page_ad.split('/')[-2])]
 				element_str = "".join(element_list)
+				# id_num = page_ad.split('/')[-2]
+				# print(id_num)
 				for text in element_list:
 					output_file.write(text+ '\n')
 				output_file.write('-------------------------------------------------------------------------\n')

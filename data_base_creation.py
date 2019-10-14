@@ -2,7 +2,8 @@ import sqlite3
 conn = sqlite3.connect('cian.db')
 cur = conn.cursor()
 cur.execute('''CREATE TABLE flats
-             (Number_of_rooms integer,
+             (id integer,
+             Number_of_rooms integer,
              housing_complex text,
              total_area real,
              living_area real,
