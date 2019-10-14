@@ -8,15 +8,18 @@ def housing_complex_parser(flat_string):
 	return housing_complex
 
 def address_parser(flat_string):
-	st = str(flat_string.split('\n')[1]+flat_string.split('\n')[2]).split('⋅')[0].replace('Санкт-Петербург,', '').replace('На карте', '').strip()
-	if bool(re.search(r'р-н\s+\w+,\s*', st))==False:
-		print(st)
-		st = None
+	reg_for_address = re.search(r'address:\n.+', flat_string).group(0).replace('address:\n','').replace('р-н ','').replace('На карте','')
+	# print(reg_for_address
+	# reg_for_address = re.search(r'address:\s+.+\s', flat_string)
+	if bool(reg_for_address)==False:
+		city = None
+		district = None
+		municipal = None
+		street = None
+		building = None
 	else:
-		st = st.replace(re.search(r'р-н\s+\w+,\s*', st).group(0),'').strip()
-		if bool(re.search(r'в\s+ЖК\s+«(\w+\s*\w*)+»', st)):
-			st = st.replace(re.search(r'в\s+ЖК\s+«(\w+\s*\w*)+»', st).group(0),'').strip().strip(',').strip()
-	return st
+		city, district, municipal, street, building = reg_for_address.split(',')
+	return city, district, municipal, street, building
 
 def amount_and_square_parser(flat_string):
 	string_with_amount_and_square = re.search(r'\d+-комн.\s+квартира,\s+\d+,?\d*', flat_string).group(0)
@@ -214,3 +217,4 @@ def id_num_parser(flat_string):
 	else:
 		id_num = int(reg_for_id_num.group(0).split()[-1])
 	return id_num
+

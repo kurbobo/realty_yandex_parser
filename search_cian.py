@@ -20,11 +20,14 @@ def parser(flat_string):
 	storey_number, whole_storeys = storey_number_parser(flat_string)
 	total_price, price_per_sq_meter = price_parser(flat_string)
 	bathroom_num, bathroom_separate = bathroom_parser(flat_string)
+	city, district,  municipal, street, building = address_parser(flat_string)
 	element_dict = {'id': id_num_parser(flat_string), 'Number_of_rooms': amount_of_rooms,'housing_complex': housing_complex_parser(flat_string),
 	 'total_area': total_square, 'living_area':living_area_parser(flat_string),
 	'kitchen_area': kitchen_area_parser(flat_string), 'storey_number': storey_number, 'whole_storey_number': whole_storeys,
 	'Building_year': building_year_parser(flat_string), 'total_price': int(total_price), 'price_per_sq_meter':int(price_per_sq_meter),
-	'address': address_parser(flat_string), 'type_of_flat':type_of_flat_parser(flat_string),
+	'city' : city, 'district' : district,  'municipal' : municipal,
+	'street' : street, 'building' : building,
+	'type_of_flat':type_of_flat_parser(flat_string),
 	'сeiling_height': seiling_hight_parser(flat_string), 'bathroom_number': bathroom_num,
 	'bathroom_separated': bathroom_separate, 'windows_to_street': windows_to_street_parser(flat_string),
 	'house_type': house_type_parser(flat_string), 'ceiling_type': ceiling_type_parser(flat_string),
@@ -56,6 +59,9 @@ try:
 			for page_ad in ads_on_page:
 				browser.get(page_ad)
 				element_list = list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--header--2Ayiz')))
+				element_list += ["address:\n"]
+				element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('address.a10a3f92e9--address--140Ec')))
+				element_list += ["\n"]
 				element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--description--10czU')))
 				element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--price-container--29gwP')))
 				element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--section_divider--1zGrv')))
