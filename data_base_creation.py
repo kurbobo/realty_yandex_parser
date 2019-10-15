@@ -13,7 +13,11 @@ cur.execute('''CREATE TABLE flats
              Building_year integer,
              total_price integer,
              price_per_sq_meter integer,
-             address text,
+             city text,
+             district text,
+             municipal text,
+             street text,
+             building text,
              type_of_flat text,
              сeiling_height real,
              bathroom_number integer,
@@ -28,12 +32,8 @@ cur.execute('''CREATE TABLE flats
              emergency_condition text,
              room1_square real,
              room2_square real,
-             room3_square real)''')
-# my_dict = {'Number_of_rooms': 1, 'housing_complex': 'Дом на набережной', 'total_area': 44.0, 'living_area': 15.6, 'kitchen_area': 15.7, 'storey_number': '2', 'whole_storey_number': '20', 'Building_year': 2018, 'total_price': 6790000, 'price_per_sq_meter': 154318, 'address': 'Дом 5, сдан Невская застава, Общественный пер., 5', 'type_of_flat': 'Вторичка'}
-# columns = ', '.join(my_dict.keys())
-# placeholders = ':'+', :'.join(my_dict.keys())
-# query = 'INSERT INTO my_table (%s) VALUES (%s)' % (columns, placeholders)
-# print(query)
-# cur.execute(query, my_dict)
+             room3_square real,
+             latitude real,
+             longitude real)''')
 conn.commit()
 conn.close()

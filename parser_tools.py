@@ -1,4 +1,6 @@
 import re
+from geopy.geocoders import Nominatim
+
 
 def housing_complex_parser(flat_string):
 	reg_for_hc = r'в\s+ЖК\s+«(\w+\s*\w*)+»'
@@ -7,22 +9,26 @@ def housing_complex_parser(flat_string):
 	else: housing_complex = re.search(reg_for_hc , flat_string).group(0).split('«')[1].split('»')[0]
 	return housing_complex
 
+
 def address_parser(flat_string):
-	reg_for_address = re.search(r'address:\s+.+\s', flat_string)
-	if bool(reg_for_address)==False:
-		address = None
+	reg_for_address = re.search(r'address:\n.+', flat_string).group(0).replace('address:\n','').replace('р-н ','').replace('На карте','')\
+	.replace('дор. ','').replace('просп.','').replace('ул.','')# 
+	if bool(reg_for_address)==False:# дор.
+		city = district = municipal = street = building = None
 	else:
-		address = reg_for_address.group(0).split()
-	return address
+		city, district, municipal, street, building = reg_for_address.split(',')
+	return city, district, municipal, street, building
+
 
 def amount_and_square_parser(flat_string):
-	string_with_amount_and_square = re.search(r'\d+-комн.\s+квартира,\s+\d+,?\d*', flat_string).group(0)
-	if bool(string_with_amount_and_square)==False:
+	reg_for_amount_and_square = re.search(r'\d+-комн.\s+квартира,\s+\d+,?\d*', flat_string).group(0)
+	if bool(reg_for_amount_and_square)==False:
 		amount_of_rooms = total_square = None
 	else:
-		amount_of_rooms, total_square = re.findall('\s*\d+,?\d*', string_with_amount_and_square)
+		amount_of_rooms, total_square = re.findall('\s*\d+,?\d*', reg_for_amount_and_square)
 		amount_of_rooms, total_square = int(amount_of_rooms), float(total_square.replace(',', '.'))
 	return amount_of_rooms, total_square
+
 
 def living_area_parser(flat_string):
 	reg_for_liv_ar = re.search(r'\d+,?\d*\s+\w+\sЖилая', flat_string)
@@ -33,6 +39,7 @@ def living_area_parser(flat_string):
 		living_area = float(living_area.replace(',', '.'))
 	return living_area
 
+
 def kitchen_area_parser(flat_string):
 	reg_for_liv_ar = re.search(r'\d+,?\d*\s+\w+\sКухня', flat_string)
 	if bool(reg_for_liv_ar)==False:
@@ -42,6 +49,7 @@ def kitchen_area_parser(flat_string):
 		kitchen_area = float(kitchen_area.replace(',', '.'))
 	return kitchen_area
 
+
 def type_of_flat_parser(flat_string):
 	reg_for_type = re.search(r'Тип жилья\s+\w+', flat_string)
 	if bool(reg_for_type)==False:
@@ -49,6 +57,7 @@ def type_of_flat_parser(flat_string):
 	else:
 		type_of_flat = reg_for_type.group(0).split()[-1]
 	return type_of_flat
+
 
 def storey_number_parser(flat_string):
 	reg_for_liv_ar = re.search(r'\d+\s+из\s+\d+\s*Этаж', flat_string)
@@ -58,6 +67,7 @@ def storey_number_parser(flat_string):
 		storey_number = reg_for_liv_ar.group(0).split()[0], reg_for_liv_ar.group(0).split()[2]
 	return storey_number
 
+
 def building_year_parser(flat_string):
 	reg_for_building_year = re.search(r'\d+\s*Построен', flat_string)
 	if bool(reg_for_building_year)==False:
@@ -65,6 +75,7 @@ def building_year_parser(flat_string):
 	else:
 		building_year = int(reg_for_building_year.group(0).split()[0])
 	return building_year
+
 
 def price_parser(flat_string):
 	reg_for_price = re.search(r'\d+\s*\d*\s*\d*\s*₽\s*'*2, flat_string)
@@ -212,3 +223,21 @@ def id_num_parser(flat_string):
 		id_num = int(reg_for_id_num.group(0).split()[-1])
 	return id_num
 
+
+def latitude(string):
+	nom = Nominatim()
+	n = nom.geocode(string)
+	if n is None:
+		return None
+	else:
+		return n.latitude
+
+
+def longitude(string):
+	nom = Nominatim()
+	n = nom.geocode(string)
+	if n is None:
+		return None
+	else:
+		return n.longitude
+print(latitude('Санкт-Петербург,  Русановская, 13 к1'))
