@@ -3,7 +3,7 @@ from time import clock
 import pandas as pd
 from parser_tools import *
 import pymongo
-
+import requests
 number_of_pages = 1
 open('cian.txt','w').close()
 chrome_options = webdriver.ChromeOptions()
@@ -101,10 +101,16 @@ try:
 				element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--offer_card_page-bti--2BrZ7')))
 				element_list += ["ID_num: " + str(page_ad.split('/')[-2])]
 				element_str = "".join(element_list)
+				print(element_str)
 				for text in element_list:
 					output_file.write(text + '\n')
 				output_file.write('-------------------------------------------------------------------------\n')
+				response = requests.get(page_ad)
+				imgUrls = re.findall('img .*?src="(.*?)"', response.text)
 				info_dict = parser(element_str)
+				print(type(info_dict))
+				info_dict.update( {'pic_urls' : imgUrls})
+				print(type(info_dict))
 				db.coll.save(info_dict)
 				info_list.append(info_dict)
 
