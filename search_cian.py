@@ -1,9 +1,8 @@
 from selenium import webdriver
-import sqlite3
 from time import clock
 import pandas as pd
 from parser_tools import *
-
+import pymongo
 
 number_of_pages = 1
 open('cian.txt','w').close()
@@ -11,8 +10,16 @@ chrome_options = webdriver.ChromeOptions()
 prefs = {"profile.managed_default_content_settings.images": 2, 'disk-cache-size': 4096}
 chrome_options.add_experimental_option("prefs", prefs)
 info_list = []
-conn = sqlite3.connect('cian.db')
-cur = conn.cursor()
+
+# соединяемся с сервером базы данных 
+# (по умолчанию подключение осуществляется на localhost:27017)
+connect = pymongo.MongoClient('localhost', 27017)
+
+# выбираем базу данных
+db = connect.flats
+
+# выбираем коллекцию документов
+coll = db.user
 start = clock()
 
 
@@ -98,12 +105,9 @@ try:
 					output_file.write(text + '\n')
 				output_file.write('-------------------------------------------------------------------------\n')
 				info_dict = parser(element_str)
-				columns = ', '.join(info_dict.keys())
-				placeholders = ':' + ', :'.join(info_dict.keys())
-				query = 'INSERT INTO flats (%s) VALUES (%s)' % (columns, placeholders)
-				cur.execute(query, info_dict)
+				db.coll.save(info_dict)
 				info_list.append(info_dict)
-				conn.commit()
+
 			# Open next page with search results
 			browser.get(new_window_url)
 except Exception as e:
@@ -114,5 +118,4 @@ finally:
 	df = pd.DataFrame(info_list)
 	df.to_csv('cian.csv', sep='\t', index=False)
 	print('Parsing done in ' + str(end - start) + ' seconds.')
-	conn.close()
 	browser.quit()
