@@ -241,3 +241,16 @@ def longitude(string):
 	else:
 		return n.longitude
 print(latitude('Санкт-Петербург,  Русановская, 13 к1'))
+
+
+def visitors_parser(flat_string):
+	reg_for_visitors = re.findall(r'Количество просмотров.+', flat_string)
+	if bool(reg_for_visitors)==False:# дор.
+		visitors = None
+	else:
+		visitors = []
+		print(reg_for_visitors)
+		for visitor_day in reg_for_visitors:
+			visitors.append(visitor_day.split()[-1])
+	print(visitors)
+	return visitors

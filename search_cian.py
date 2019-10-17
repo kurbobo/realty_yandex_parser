@@ -4,6 +4,7 @@ from time import clock
 import pandas as pd
 from parser_tools import *
 import pymongo
+import time
 
 
 number_of_pages = 1
@@ -69,7 +70,8 @@ def parser(flat_string):
 					'room2_square': room2_square_parser(flat_string),
 					'room3_square': room3_square_parser(flat_string),
 					'latitude': latitude(city + ',' + street + ',' + building_for_coordinates),
-					'longitude': longitude(city + ',' + street + ',' + building_for_coordinates)}
+					'longitude': longitude(city + ',' + street + ',' + building_for_coordinates),
+					'visitors' : visitors_parser(flat_string)}
 	return element_dict
 
 
@@ -103,10 +105,12 @@ try:
 				element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--offer_card_page-bti--2BrZ7')))
 				element_list += ["ID_num: " + str(page_ad.split('/')[-2])]
 				browser.find_element_by_css_selector('a.a10a3f92e9--link--1t8n1.a10a3f92e9--link--2mJJk').click()
+				time.sleep(0.5)
 				for elementName in browser.find_elements_by_css_selector("path.highcharts-point"):
 					hover = ActionChains(browser).move_to_element(elementName).click().perform()
+					time.sleep(0.1)
 					element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector("g.highcharts-label.highcharts-tooltip.highcharts-color-undefined")))
-
+					element_list += ["\n"]
 				element_str = "".join(element_list)
 				for text in element_list:
 					output_file.write(text + '\n')
