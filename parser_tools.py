@@ -16,7 +16,8 @@ def address_parser(flat_string):
 	if bool(reg_for_address)==False:# дор.
 		city = district = municipal = street = building = None
 	else:
-		city, district, municipal, street, building = reg_for_address.split(',')
+		adress_list = reg_for_address.split(',')
+		city, district, municipal, street, building = adress_list[0], adress_list[1], adress_list[2], adress_list[-2], adress_list[-1]
 	return city, district, municipal, street, building
 
 
