@@ -112,7 +112,7 @@ try:
 				output_file.write('-------------------------------------------------------------------------\n')
 				info_dict = parser(element_str)
 				info_dict.update( {'pic_urls' : list(map(lambda x: x.get_attribute("src"), browser.find_elements_by_css_selector('img.fotorama__img')))})
-				db.coll.save(info_dict)
+				db.coll.insert_one(info_dict)
 				info_list.append(info_dict)
 
 			# Open next page with search results
