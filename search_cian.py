@@ -33,11 +33,6 @@ def parser(flat_string):
 	total_price, price_per_sq_meter = price_parser(flat_string)
 	bathroom_num, bathroom_separate = bathroom_parser(flat_string)
 	city, district,  municipal, street, building = address_parser(flat_string)
-	if ('к' in building or 'К' in building) and building is not None:
-		lst = building.split('к')
-		building_for_coordinates = lst[0] + ' к' + lst[1]
-	else:
-		building_for_coordinates = building
 	element_dict = {'id': id_num_parser(flat_string),
 					'Number_of_rooms': amount_of_rooms,
 					'housing_complex': housing_complex_parser(flat_string),
@@ -69,8 +64,8 @@ def parser(flat_string):
 					'room1_square': room1_square_parser(flat_string),
 					'room2_square': room2_square_parser(flat_string),
 					'room3_square': room3_square_parser(flat_string),
-					'latitude': latitude(city + ',' + street + ',' + building_for_coordinates),
-					'longitude': longitude(city + ',' + street + ',' + building_for_coordinates),
+					'latitude': latitude(city, street, building),
+					'longitude': longitude(city, street, building),
 					'visitors' : visitors_parser(flat_string)}
 	return element_dict
 

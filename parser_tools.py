@@ -223,24 +223,35 @@ def id_num_parser(flat_string):
 		id_num = int(reg_for_id_num.group(0).split()[-1])
 	return id_num
 
+def building_for_coordinates(building):
+	if ('к' in building) and building is not None:
+		lst = building.split('к')
+		building_correct = lst[0] + ' к' + lst[1]
+	elif ('К' in building) and building is not None:
+		lst = building.split('К')
+		building_correct = lst[0] + ' к' + lst[1]
+	else:
+		building_correct = building
+	return building_correct
 
-def latitude(string):
+def latitude(city, street, building):
+	place = city + ',' + street + ',' + building_for_coordinates(building)
 	nom = Nominatim()
-	n = nom.geocode(string)
+	n = nom.geocode(place)
 	if n is None:
 		return None
 	else:
 		return n.latitude
 
 
-def longitude(string):
+def longitude(city, street, building):
+	place = city + ',' + street + ',' + building_for_coordinates(building)
 	nom = Nominatim()
-	n = nom.geocode(string)
+	n = nom.geocode(place)
 	if n is None:
 		return None
 	else:
 		return n.longitude
-print(latitude('Санкт-Петербург,  Русановская, 13 к1'))
 
 
 def visitors_parser(flat_string):
