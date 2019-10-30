@@ -10,7 +10,6 @@ import time
 number_of_pages = 1
 open('cian.txt','w').close()
 chrome_options = webdriver.ChromeOptions()
-# prefs = {"profile.managed_default_content_settings.images": 2, 'disk-cache-size': 4096}
 prefs = {'disk-cache-size': 4096}
 chrome_options.add_experimental_option("prefs", prefs)
 info_list = []

@@ -13,7 +13,7 @@ def housing_complex_parser(flat_string):
 def address_parser(flat_string):
 	reg_for_address = re.search(r'address:\n.+', flat_string).group(0).replace('address:\n','').replace('р-н ','').replace('На карте','')\
 	.replace('дор. ','').replace('просп.','').replace('ул.','')# 
-	if bool(reg_for_address)==False:# дор.
+	if bool(reg_for_address)==False:
 		city = district = municipal = street = building = None
 	else:
 		adress_list = reg_for_address.split(',')
@@ -235,6 +235,7 @@ def building_for_coordinates(building):
 		building_correct = building
 	return building_correct
 
+
 def latitude(city, street, building):
 	place = city + ',' + street + ',' + building_for_coordinates(building)
 	nom = Nominatim()
@@ -257,12 +258,10 @@ def longitude(city, street, building):
 
 def visitors_parser(flat_string):
 	reg_for_visitors = re.findall(r'Количество просмотров.+', flat_string)
-	if bool(reg_for_visitors)==False:# дор.
+	if bool(reg_for_visitors)==False:
 		visitors = None
 	else:
 		visitors = []
-		print(reg_for_visitors)
 		for visitor_day in reg_for_visitors:
 			visitors.append(visitor_day.split()[-1])
-	print(visitors)
 	return visitors
