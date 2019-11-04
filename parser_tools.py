@@ -1,5 +1,9 @@
 import re
 from geopy.geocoders import Nominatim
+import datetime
+from datetime import timedelta
+
+correct_building_name = ['address:\n', 'р-н ', 'На карте', 'дор. ', 'просп.', 'ул.']
 
 
 def housing_complex_parser(flat_string):
@@ -11,21 +15,24 @@ def housing_complex_parser(flat_string):
 
 
 def address_parser(flat_string):
-	reg_for_address = re.search(r'address:\n.+', flat_string).group(0).replace('address:\n','').replace('р-н ','').replace('На карте','')\
-	.replace('дор. ','').replace('просп.','').replace('ул.','')# 
+	reg_for_address = re.search(r'address:\n.+', flat_string)
 	if bool(reg_for_address)==False:
 		city = district = municipal = street = building = None
 	else:
+		reg_for_address = reg_for_address.group(0)
+		for name in correct_building_name:
+			reg_for_address = reg_for_address.replace(name, '')
 		adress_list = reg_for_address.split(',')
 		city, district, municipal, street, building = adress_list[0], adress_list[1], adress_list[2], adress_list[-2], adress_list[-1]
 	return city, district, municipal, street, building
 
 
 def amount_and_square_parser(flat_string):
-	reg_for_amount_and_square = re.search(r'\d+-комн.\s+квартира,\s+\d+,?\d*', flat_string).group(0)
+	reg_for_amount_and_square = re.search(r'\d+-комн.\s+квартира,\s+\d+,?\d*', flat_string)
 	if bool(reg_for_amount_and_square)==False:
 		amount_of_rooms = total_square = None
 	else:
+		reg_for_amount_and_square = reg_for_amount_and_square.group(0)
 		amount_of_rooms, total_square = re.findall('\s*\d+,?\d*', reg_for_amount_and_square)
 		amount_of_rooms, total_square = int(amount_of_rooms), float(total_square.replace(',', '.'))
 	return amount_of_rooms, total_square
@@ -261,7 +268,11 @@ def visitors_parser(flat_string):
 	if bool(reg_for_visitors)==False:
 		visitors = None
 	else:
-		visitors = []
+		visitors = {}
+		today = datetime.datetime.today()
+		oneday = timedelta(days=1)
+		previousday = today - oneday
 		for visitor_day in reg_for_visitors:
-			visitors.append(visitor_day.split()[-1])
+			visitors.update({previousday.strftime('%Y-%m-%d'): visitor_day.split()[-1]})
+			previousday = previousday - oneday
 	return visitors

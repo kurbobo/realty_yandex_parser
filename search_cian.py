@@ -7,7 +7,8 @@ import pymongo
 import time
 
 
-number_of_pages = 1
+
+number_of_pages = 10
 open('cian.txt','w').close()
 chrome_options = webdriver.ChromeOptions()
 prefs = {'disk-cache-size': 4096}
