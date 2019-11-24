@@ -276,3 +276,25 @@ def visitors_parser(flat_string):
 			visitors.update({previousday.strftime('%Y-%m-%d'): visitor_day.split()[-1]})
 			previousday = previousday - oneday
 	return visitors
+
+def date_of_place_parser(flat_string):
+	reg_for_date_of_place = re.search(r'с даты создания объявления.*', flat_string)
+	if bool(reg_for_date_of_place)==False:
+		date_of_place = None
+	else:
+		try:
+			date_of_place = ''.join(re.findall(r'\d*\.\d*\.\d*', reg_for_date_of_place.group(0)))
+		except:
+			date_of_place = None
+	return date_of_place
+
+def total_number_views_parser(flat_string):
+	reg_for_total_number_views = re.search(r'.*с даты создания объявления', flat_string)
+	if bool(reg_for_total_number_views)==False:
+		total_number_views = None
+	else:
+		try:
+			total_number_views = ''.join(re.findall(r'\d*', reg_for_total_number_views.group(0)))
+		except:
+			total_number_views = None
+	return total_number_views
