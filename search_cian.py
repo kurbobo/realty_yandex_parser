@@ -121,15 +121,18 @@ try:
 				element_list += ["\n"]
 				element_list += ["ID_num: " + str(page_ad.split('/')[-2])]
 				element_list += ["\n"]
-				browser.find_element_by_css_selector('a.a10a3f92e9--link--1t8n1.a10a3f92e9--link--2mJJk').click()
-				time.sleep(0.5)
-				element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--information--AyP9e')))
-				element_list += ["\n"]
-				for elementName in browser.find_elements_by_css_selector("path.highcharts-point"):
-					hover = ActionChains(browser).move_to_element(elementName).click().perform()
-					time.sleep(0.1)
-					element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector("g.highcharts-label.highcharts-tooltip.highcharts-color-undefined")))
+				try:
+					browser.find_element_by_css_selector('a.a10a3f92e9--link--1t8n1.a10a3f92e9--link--2mJJk').click()
+					time.sleep(0.5)
+					element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--information--AyP9e')))
 					element_list += ["\n"]
+					for elementName in browser.find_elements_by_css_selector("path.highcharts-point"):
+						hover = ActionChains(browser).move_to_element(elementName).click().perform()
+						time.sleep(0.1)
+						element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector("g.highcharts-label.highcharts-tooltip.highcharts-color-undefined")))
+						element_list += ["\n"]
+				except:
+					print("No info about visitors in ad: " + str(page_ad))
 				element_str = "".join(element_list)
 				for text in element_list:
 					output_file.write(text + '\n')
