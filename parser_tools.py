@@ -105,7 +105,7 @@ def seiling_hight_parser(flat_string):
 
 
 def bathroom_parser(flat_string):
-	reg_for_bathroom = re.search(r'Санузел\s+\w+\s+\w+', flat_string)
+	reg_for_bathroom = re.search(r'Санузел\s+\d+\s+\w+', flat_string)
 	if bool(reg_for_bathroom)==False:
 		bathroom_num = None
 		bathroom_separate = None
