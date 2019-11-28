@@ -145,7 +145,8 @@ try:
 			# Open next page with search results
 			browser.get(new_window_url)
 except Exception as e:
-	print(e)
+        print("Error has occured in: " + str(page_ad))
+        print(e)
 
 finally:
 	end = clock()
