@@ -73,7 +73,6 @@ def parser(flat_string):
 					'latitude': latitude(city, street, building),
 					'longitude': longitude(city, street, building),
 					'visitors' : visitors_parser(flat_string),
-					'price_dynamics' : price_dynamics,
 					'date_of_place': date_of_place_parser(flat_string),
 					'total_number_views': total_number_views_parser(flat_string)}
 	return element_dict
@@ -107,17 +106,6 @@ try:
 				element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--section_divider--1zGrv')))
 				element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--offer_card_page-main--1glTM a10a3f92e9--aside_banner--2FWCV')))
 				element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--offer_card_page-bti--2BrZ7')))
-				#statistics of price change
-				price_dynamics = []
-				# try:
-					# price_dynamics += [list(map(lambda x: x.text, browser.find_elements_by_class_name("price_history_widget-event-date-At3o0vWR")))]
-				price_dynamics += [list(map(lambda x: x.text, browser.find_elements_by_css_selector('td.price_history_widget-event-date-At3o0vWR')))]
-				price_dynamics += [list(map(lambda x: x.text, browser.find_elements_by_css_selector('td.price_history_widget-event-price-1hxoWz1dS')))]
-				# price_dynamics += [list(map(lambda x: x.text, browser.find_elements_by_class_name("price_history_widget-event-price-1hxoWz1dS")))]
-				# price_dynamics += [list(map(lambda x: x.text, browser.find_elements_by_class_name("price_history_widget-event-price-1hxoWz1dS")))]
-					#price_dynamics += [list(map(lambda x: x.text, browser.find_element_by_xpath("//td[contains(@class, 'price_history_widget-event-diff-kMzxzDwM')]")))]
-				# except:
-				# 	price_dynamics = []
 				element_list += ["\n"]
 				element_list += ["ID_num: " + str(page_ad.split('/')[-2])]
 				element_list += ["\n"]
