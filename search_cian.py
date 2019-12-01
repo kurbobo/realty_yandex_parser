@@ -20,16 +20,6 @@ driver = os.path.join("/usr/local/bin","chromedriver")
 prefs = {'disk-cache-size': 4096}
 chrome_options.add_experimental_option("prefs", prefs)
 
-# соединяемся с сервером базы данных
-# (по умолчанию подключение осуществляется на localhost:27017)
-connect = pymongo.MongoClient('localhost', 27017, maxPoolSize=200)
-
-# выбираем базу данных
-db = connect.flats
-
-# выбираем коллекцию документов
-db.user
-
 
 start = clock()
 
@@ -38,7 +28,6 @@ db_free = 1
 
 initial_id = 220833621
 num_of_nodes = 2
-# driver_names = list(map(lambda i: 'browser'))
 
 def parser(flat_string):
 	amount_of_rooms, total_square = amount_and_square_parser(flat_string)
@@ -124,14 +113,21 @@ def crawler(page_id):
 			output_file.write('-------------------------------------------------------------------------\n')
 			info_dict = parser(element_str)
 			info_dict.update( {'pic_urls' : list(map(lambda x: x.get_attribute("src"), browser.find_elements_by_css_selector('img.fotorama__img')))})
-			# global db_free
-			# while db_free == 0:
-			# 	time.sleep(0.01)
-			# else:
-			# 	db_free = 0
-			# 	db.coll.insert_one(info_dict)
-			# 	db_free = 1
-			# db.close()
+			# соединяемся с сервером базы данных
+			# (по умолчанию подключение осуществляется на localhost:27017)
+			connect = pymongo.MongoClient('localhost', 27017, maxPoolSize=200)
+			# выбираем базу данных
+			db = connect.flats
+			# выбираем коллекцию документов
+			db.user
+			global db_free
+			while db_free == 0:
+				time.sleep(0.01)
+			else:
+				db_free = 0
+				db.coll.insert_one(info_dict)
+				db_free = 1
+			connect.close()
 			browser.quit()
 			return 0
 
@@ -141,18 +137,13 @@ def crawler(page_id):
 		browser.quit()
 		return 1
 
+
 if __name__=="__main__":
 	import multiprocessing as mp
 	print("ololo")
 	pool = mp.Pool(processes=2)
-	# for i in range(0, 5):
 	pool.map(crawler, list(i + initial_id for i in range(0, 15)))
 
 
+print('Parsing is done!!!')
 
-# #finally:
-end = clock()
-# df = pd.DataFrame(info_list)
-# df.to_csv('cian.csv', sep='\t', index=False)
-print('Parsing done in ' + str(end - start) + ' seconds.')
-#browser.quit()
