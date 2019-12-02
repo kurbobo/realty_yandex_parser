@@ -20,12 +20,7 @@ driver = os.path.join("/usr/local/bin","chromedriver")
 prefs = {'disk-cache-size': 4096}
 chrome_options.add_experimental_option("prefs", prefs)
 
-
-start = clock()
-
-
 db_free = 1
-
 initial_id = 220833621
 num_of_nodes = 2
 
@@ -64,13 +59,25 @@ def parser(flat_string):
 					'total_number_views': total_number_views_parser(flat_string)}
 	return element_dict
 
-def crawler(page_id):
+
+def crawler(page_id, page_num):
+	stop_trying = 0
+	while(str(download_data(page_id)) == 'Service timed out' and stop_trying == 10):
+		stop_trying += 1
+		if (stop_trying < 10):
+			print('Restarting this process.')
+		else:
+			print('Stop trying to download ad num:' + str(page_id))
+
+	print('Ad with number: ' + str(page_num) + ' finished parsing.')
+
+
+
+
+def download_data(page_id):
 	try:
 		with open( 'ads_texts/'+ str(page_id) + '.txt', 'a', encoding='utf-8') as output_file:
-
-			browser = webdriver.Chrome(chrome_options=chrome_options)
-			print('.')
-
+			browser = webdriver.Chrome(options=chrome_options)
 			# Get the URL of next page to be parsed
 			browser.get("https://spb.cian.ru/sale/flat/" + str(page_id) + "/")
 
@@ -122,18 +129,18 @@ def crawler(page_id):
 			browser.quit()
 			return 0
 
-	except Exception as e:
+	except Exception as exception:
 		print("Error has occured in: " + str(page_id))
-		print(e)
+		print(exception)
 		browser.quit()
-		return 1
+		return exception
 
 
 if __name__=="__main__":
 	import multiprocessing as mp
 	print("ololo")
-	pool = mp.Pool(processes=2)
-	pool.map(crawler, list(i + initial_id for i in range(0, 15)))
+	pool = mp.Pool(processes=num_of_nodes)
+	pool.starmap(crawler, list(tuple((i + initial_id, i)) for i in range(0, 20)))
 
 
 print('Parsing is done!!!')
