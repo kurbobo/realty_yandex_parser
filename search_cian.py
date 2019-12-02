@@ -30,15 +30,14 @@ initial_id = 220833621
 num_of_nodes = 2
 
 def parser(flat_string):
-	amount_of_rooms, total_square = amount_and_square_parser(flat_string)
 	storey_number, whole_storeys = storey_number_parser(flat_string)
 	total_price, price_per_sq_meter = price_parser(flat_string)
 	bathroom_num, bathroom_separate = bathroom_parser(flat_string)
 	city, district,  municipal, street, building = address_parser(flat_string)
 	element_dict = {'id': id_num_parser(flat_string),
-					'Number_of_rooms': amount_of_rooms,
+					'Number_of_rooms': number_of_rooms_parser(flat_string),
 					'housing_complex': housing_complex_parser(flat_string),
-					'total_area': total_square,
+					'total_area': total_square_parser(flat_string),
 					'living_area': living_area_parser(flat_string),
 					'kitchen_area': kitchen_area_parser(flat_string),
 					'storey_number': storey_number,

@@ -27,15 +27,26 @@ def address_parser(flat_string):
 	return city, district, municipal, street, building
 
 
-def amount_and_square_parser(flat_string):
-	reg_for_amount_and_square = re.search(r'\d+-комн.\s+квартира,\s+\d+,?\d*', flat_string)
-	if bool(reg_for_amount_and_square)==False:
-		amount_of_rooms = total_square = None
+def number_of_rooms_parser(flat_string):
+	reg_for_number_of_rooms = re.search(r'\d+-комн.\s+квартира,\s+\d+,?\d*', flat_string)
+	if bool(reg_for_number_of_rooms)==False:
+		number_of_rooms = None
 	else:
-		reg_for_amount_and_square = reg_for_amount_and_square.group(0)
-		amount_of_rooms, total_square = re.findall('\s*\d+,?\d*', reg_for_amount_and_square)
-		amount_of_rooms, total_square = int(amount_of_rooms), float(total_square.replace(',', '.'))
-	return amount_of_rooms, total_square
+		reg_for_number_of_rooms = reg_for_number_of_rooms.group(0)
+		number_of_rooms, total_square = re.findall('\s*\d+,?\d*', reg_for_number_of_rooms)
+		number_of_rooms = int(number_of_rooms)
+	return number_of_rooms
+
+
+def total_square_parser(flat_string):
+	reg_for_total_square = re.search(r'\d+-комн.\s+квартира,\s+\d+,?\d*', flat_string)
+	if bool(reg_for_total_square)==False:
+		total_square = None
+	else:
+		reg_for_total_square = reg_for_total_square.group(0)
+		amount_of_rooms, total_square = re.findall('\s*\d+,?\d*', reg_for_total_square)
+		total_square = float(total_square.replace(',', '.'))
+	return total_square
 
 
 def living_area_parser(flat_string):
