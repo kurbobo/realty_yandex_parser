@@ -30,7 +30,6 @@ initial_id = 220833621
 num_of_nodes = 2
 
 def parser(flat_string):
-	bathroom_num, bathroom_separate = bathroom_parser(flat_string)
 	element_dict = {'id': id_num_parser(flat_string),
 					'Number_of_rooms': number_of_rooms_parser(flat_string),
 					'housing_complex': housing_complex_parser(flat_string),
@@ -45,8 +44,8 @@ def parser(flat_string):
 					'address' : address_parser(flat_string),
 					'type_of_flat':type_of_flat_parser(flat_string),
 					'сeiling_height': seiling_hight_parser(flat_string),
-					'bathroom_number': bathroom_num,
-					'bathroom_separated': bathroom_separate,
+					'bathroom_number': bathroom_num_parser(flat_string),
+					'bathroom_separated': bathroom_separate_parser(flat_string),
 					'windows_to_street': windows_to_street_parser(flat_string),
 					'house_type': house_type_parser(flat_string),
 					'ceiling_type': ceiling_type_parser(flat_string),

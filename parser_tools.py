@@ -133,15 +133,22 @@ def seiling_hight_parser(flat_string):
 	return ceiling_height
 
 
-def bathroom_parser(flat_string):
-	reg_for_bathroom = re.search(r'Санузел\s+\d+\s+\w+', flat_string)
-	if bool(reg_for_bathroom)==False:
+def bathroom_num_parser(flat_string):
+	reg_for_bathroom_num = re.search(r'Санузел\s+\d+\s+\w+', flat_string)
+	if bool(reg_for_bathroom_num)==False:
 		bathroom_num = None
+	else:
+		bathroom_num = int(reg_for_bathroom_num.group(0).split()[1])
+	return bathroom_num
+
+
+def bathroom_separate_parser(flat_string):
+	reg_for_bathroom_separate = re.search(r'Санузел\s+\d+\s+\w+', flat_string)
+	if bool(reg_for_bathroom_separate)==False:
 		bathroom_separate = None
 	else:
-		bathroom_num = int(reg_for_bathroom.group(0).split()[1])
-		bathroom_separate = 'Yes' if "разд" in reg_for_bathroom.group(0).split()[2] else 'No'
-	return bathroom_num, bathroom_separate
+		bathroom_separate = 'Yes' if "разд" in reg_for_bathroom_separate.group(0).split()[2] else 'No'
+	return bathroom_separate
 
 
 def windows_to_street_parser(flat_string):
