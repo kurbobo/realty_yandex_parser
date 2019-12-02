@@ -19,7 +19,6 @@ chrome_options.add_experimental_option("prefs", prefs)
 
 db_free = 1
 initial_id = 220833621
-num_of_nodes = 2
 
 def parser(flat_string):
 	element_dict = {'id': id_num_parser(flat_string),
@@ -135,7 +134,9 @@ def download_data(page_id):
 
 if __name__=="__main__":
 	import multiprocessing as mp
-	pool = mp.Pool(processes=num_of_nodes)
+	num_of_cores = mp.cpu_count()
+	print('Start execution with ' + str(num_of_cores) + ' cores.')
+	pool = mp.Pool(processes=num_of_cores)
 	pool.starmap(crawler, list(tuple((i + initial_id, i)) for i in range(0, 20)))
 
 
