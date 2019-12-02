@@ -58,7 +58,7 @@ def parser(flat_string):
 
 def crawler(page_id, page_num):
 	stop_trying = 0
-	while(str(download_data(page_id)) == 'Service timed out' and stop_trying == 10):
+	while(str(download_data(page_id)) == 'Service timed out' and stop_trying < 10):
 		stop_trying += 1
 		if (stop_trying < 10):
 			print('Restarting this process.')
