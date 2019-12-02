@@ -1,86 +1,200 @@
 from selenium import webdriver
-import sqlite3
-from time import clock
-import pandas as pd
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.common.exceptions import NoSuchElementException
 from parser_tools import *
-number_of_pages = 1
+import pymongo
+import time
+import os
+
+
+number_of_pages = 200
 open('cian.txt','w').close()
 chrome_options = webdriver.ChromeOptions()
-prefs = {"profile.managed_default_content_settings.images": 2, 'disk-cache-size': 4096}
+chrome_options.add_argument("no-sandbox")
+chrome_options.add_argument("--disable-extensions")
+chrome_options.add_argument("--disable-dev-shm-usage")
+chrome_options.add_argument("--headless")
+driver = os.path.join("/usr/local/bin","chromedriver")
+prefs = {'disk-cache-size': 4096}
 chrome_options.add_experimental_option("prefs", prefs)
-info_list = []
-import sqlite3
-conn = sqlite3.connect('cian.db')
-cur = conn.cursor()
-start = clock()
+
+db_free = 1
+initial_id = 221361553
+
+def pars_price_range(browser):
+    try:
+        price_range = browser.find_element_by_css_selector('a.a10a3f92e9--price_range-link--3Kdo-').text
+        price_range = removeNonAscii(str(price_range))
+        k_max=0
+        for k in range(len(price_range),1,-1):
+            if k*' ' in price_range:
+                k_max = k
+                break
+        price_range = price_range.split(k_max*' ')
+        price_range = list(map(lambda x: int(x.replace(' ', '')), price_range))
+    except NoSuchElementException:
+            price_range = None
+    return price_range
 
 
+
+
+def pars_house_analytics(browser):
+    try:
+        header = browser.find_element_by_css_selector("div.a10a3f92e9--averages--3nUh3")
+        house = header.find_elements_by_css_selector("div.a10a3f92e9--wrapper--2U64R")[0]
+        price, rent = house.find_elements_by_css_selector("div.a10a3f92e9--average--ITlDQ")
+
+        price_list = list(map(lambda x: removeNonAscii(str(x.text.replace(' ', ''))), price.find_elements_by_css_selector('*')))
+        price_list = list(filter(lambda a: a != '', price_list))
+        for i in price_list:
+            if not re.search(r'%\d+', i) is None and i in price_list:
+                price_list.remove(i)
+        price_list = list(map(lambda x: float(x.replace('%', '').replace(',', '.')),price_list))
+        purchase_price, purchase_dynamics = price_list
+
+        rent = list(map(lambda x: removeNonAscii(str(x.text.replace(' ', ''))), rent.find_elements_by_css_selector('*')))
+        rent_list = []
+        rent = list(filter(lambda a: a != '', rent))
+        for i in rent:
+            if re.search(r'%\d+', i) is None and '.' not in i:
+                rent_list.append(i)
+        rent_price, rent_dynamics = list(map(lambda x: float(x.replace('%', '').replace(',', '.').replace('/', '')),rent_list))
+    except NoSuchElementException:
+        purchase_price, purchase_dynamics, rent_price, rent_dynamics = [None, None,None, None]
+
+    return purchase_price, purchase_dynamics, rent_price, rent_dynamics
 def parser(flat_string):
-	amount_of_rooms, total_square = amount_and_square_parser(flat_string)
-	storey_number, whole_storeys = storey_number_parser(flat_string)
-	total_price, price_per_sq_meter = price_parser(flat_string)
-	bathroom_num, bathroom_separate = bathroom_parser(flat_string)
-	element_dict = {'Number_of_rooms': amount_of_rooms,'housing_complex': housing_complex_parser(flat_string),
-	 'total_area': total_square, 'living_area':living_area_parser(flat_string),
-	'kitchen_area': kitchen_area_parser(flat_string), 'storey_number': storey_number, 'whole_storey_number': whole_storeys,
-	'Building_year': building_year_parser(flat_string), 'total_price': int(total_price), 'price_per_sq_meter':int(price_per_sq_meter),
-	'address': address_parser(flat_string), 'type_of_flat':type_of_flat_parser(flat_string),
-	'сeiling_height': seiling_hight_parser(flat_string), 'bathroom_number': bathroom_num,
-	'bathroom_separated': bathroom_separate, 'windows_to_street': windows_to_street_parser(flat_string),
-	'house_type': house_type_parser(flat_string), 'ceiling_type': ceiling_type_parser(flat_string),
-	'porch_num': porch_num_parser(flat_string), 'central_heating': central_heating_parser(flat_string),
-	'elevator_service': elevator_service_parser(flat_string), 'elevator_passangers': elevator_passangers_parser(flat_string),
-	'emergency_condition': emergency_condition_parser(flat_string), 'room1_square': room1_square_parser(flat_string),
-	'room2_square': room2_square_parser(flat_string), 'room3_square': room3_square_parser(flat_string), 
-	'latitude': latitude(address_parser(flat_string)), 'longitude': longitude(address_parser(flat_string))}
-	return element_dict
+    element_dict = {'id': id_num_parser(flat_string),
+                    'Number_of_rooms': number_of_rooms_parser(flat_string),
+                    'housing_complex': housing_complex_parser(flat_string),
+                    'total_area': total_square_parser(flat_string),
+                    'living_area': living_area_parser(flat_string),
+                    'kitchen_area': kitchen_area_parser(flat_string),
+                    'storey_number': storey_number_parser(flat_string),
+                    'whole_storey_number': whole_storeys_parser(flat_string),
+                    'Building_year': building_year_parser(flat_string),
+                    'total_price': total_price_parser(flat_string),
+                    'price_per_sq_meter': price_per_sq_meter_parser(flat_string),
+                    'address' : address_parser(flat_string),
+                    'type_of_flat':type_of_flat_parser(flat_string),
+                    'сeiling_height': seiling_hight_parser(flat_string),
+                    'bathroom_number': bathroom_num_parser(flat_string),
+                    'bathroom_separated': bathroom_separate_parser(flat_string),
+                    'windows_to_street': windows_to_street_parser(flat_string),
+                    'house_type': house_type_parser(flat_string),
+                    'ceiling_type': ceiling_type_parser(flat_string),
+                    'porch_num': porch_num_parser(flat_string),
+                    'central_heating': central_heating_parser(flat_string),
+                    'service_elevator_number': elevator_service_parser(flat_string),
+                    'passengers_elevator_number': elevator_passangers_parser(flat_string),
+                    'emergency_condition': emergency_condition_parser(flat_string),
+                    'room1_square': room1_square_parser(flat_string),
+                    'room2_square': room2_square_parser(flat_string),
+                    'room3_square': room3_square_parser(flat_string),
+                    'latitude': latitude(address_parser(flat_string)),
+                    'longitude': longitude(address_parser(flat_string)),
+                    'visitors' : visitors_parser(flat_string),
+                    'date_of_place': date_of_place_parser(flat_string),
+                    'total_number_views': total_number_views_parser(flat_string)}
+    return element_dict
 
 
-try:
-	with open('cian.txt', 'a', encoding='utf-8') as output_file:
-		browser = webdriver.Chrome(chrome_options=chrome_options)
-		browser.get("https://spb.cian.ru/kupit-kvartiru-1-komn-ili-2-komn/")
-		for page_num in range(0,number_of_pages):
-			page_num+=1
-			print(page_num)
-			# Get the URL of next page to be parsed
-			try:
-				new_window_url = browser.find_element_by_xpath('//a[@class="_93444fe79c--list-itemLink--3o7_6" and text()="'+str(i)+'"]').get_attribute("href")
-			except:
-				new_window_url = browser.find_element_by_xpath('//a[@class="_93444fe79c--list-itemLink--3o7_6" and text()=".."]').get_attribute("href")
+def crawler(page_id, page_num):
+    stop_trying = 0
+    while(str(download_data(page_id)) == 'Service timed out' and stop_trying < 10):
+        stop_trying += 1
+        if (stop_trying < 10):
+            print('Restarting this process.')
+        else:
+            print('Stop trying to download ad num:' + str(page_id))
 
-			# Get URLs of all current ads for parsing
-			ads_on_page = list(map(lambda x: x.get_attribute("href"), browser.find_elements_by_xpath(
-				'//a[@class="link_component-link-xUBVR4w6" and text()="Подробнее"]')))
-			# Open every ad to find more info_dict
-			# TODO: find more appropriate css selectors for more accurate parsing
-			for page_ad in ads_on_page:
-				browser.get(page_ad)
-				element_list = list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--header--2Ayiz')))
-				element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--description--10czU')))
-				element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--price-container--29gwP')))
-				element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--section_divider--1zGrv')))
-				element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--offer_card_page-bti--2BrZ7')))
-				element_str = "".join(element_list)
-				for text in element_list:
-					output_file.write(text+ '\n')
-				output_file.write('-------------------------------------------------------------------------\n')
-				info_dict = parser(element_str)
-				# print(info_dict.keys())
-				columns = ', '.join(info_dict.keys())
-				placeholders = ':'+', :'.join(info_dict.keys())
-				query = 'INSERT INTO flats (%s) VALUES (%s)' % (columns, placeholders)
-				cur.execute(query, info_dict)
-				info_list.append(info_dict)
-				conn.commit()
-			# Open next page with search results
-			browser.get(new_window_url)
-except Exception as e: print(e)
+    print('Ad with number: ' + str(page_num) + ' finished parsing.')
 
-finally:
-	end = clock()
-	df = pd.DataFrame(info_list)
-	df.to_csv('cian.csv', sep='\t',index=False)
-	print('Parsing done in ' + str(end - start) + ' seconds.')
-	conn.close()
-	browser.quit()
+
+
+
+def download_data(page_id):
+    try:
+        with open( 'ads_texts/'+ str(page_id) + '.txt', 'a', encoding='utf-8') as output_file:
+            browser = webdriver.Chrome(options=chrome_options)
+            # Get the URL of next page to be parsed
+            browser.get("https://spb.cian.ru/sale/flat/" + str(page_id) + "/")
+
+            element_list = list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--header--2Ayiz')))
+            element_list += ["address:\n"]
+            element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('address.a10a3f92e9--address--140Ec')))
+            element_list += ["\n"]
+            element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--description--10czU')))
+            element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--price-container--29gwP')))
+            element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--section_divider--1zGrv')))
+            element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--offer_card_page-main--1glTM a10a3f92e9--aside_banner--2FWCV')))
+            element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--offer_card_page-bti--2BrZ7')))
+            element_list += ["\n"]
+            element_list += ["ID_num: " + str(page_id)]
+            element_list += ["\n"]
+            purchase_price, purchase_dynamics, rent_price, rent_dynamics = pars_house_analytics(browser)
+            pars_price_ran = pars_price_range(browser)
+            print('pars_price_ran = ', pars_price_ran)
+            print('purchase_price =', purchase_price)
+            print('purchase_dynamics =', purchase_dynamics)
+            print('rent_price = ',rent_price)
+            print('rent_dynamics = ',rent_dynamics)
+            try:
+                browser.find_element_by_css_selector('a.a10a3f92e9--link--1t8n1.a10a3f92e9--link--2mJJk').click()
+                time.sleep(0.5)
+                element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--information--AyP9e')))
+                element_list += ["\n"]
+                for elementName in browser.find_elements_by_css_selector("path.highcharts-point"):
+                    hover = ActionChains(browser).move_to_element(elementName).click().perform()
+                    time.sleep(0.1)
+                    element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector("g.highcharts-label.highcharts-tooltip.highcharts-color-undefined")))
+                    element_list += ["\n"]
+            except:
+                print("No info about visitors in ad: " + str(page_id))
+            element_str = "".join(element_list)
+            for text in element_list:
+                output_file.write(text + '\n')
+            output_file.write('-------------------------------------------------------------------------\n')
+            info_dict = parser(element_str)
+            info_dict['price_range'] = pars_price_range(browser)
+            info_dict['purchase_price'] = purchase_price
+            info_dict['purchase_dynamics'] = purchase_dynamics
+            info_dict['rent_price'] = rent_price
+            info_dict['rent_dynamics'] = rent_dynamics
+            info_dict.update( {'pic_urls' : list(map(lambda x: x.get_attribute("src"), browser.find_elements_by_css_selector('img.fotorama__img')))})
+            # соединяемся с сервером базы данных
+            # (по умолчанию подключение осуществляется на localhost:27017)
+            connect = pymongo.MongoClient('localhost', 27017, maxPoolSize=200)
+            # выбираем базу данных
+            db = connect.flats
+            # выбираем коллекцию документов
+            db.user
+            global db_free
+            while db_free == 0:
+                time.sleep(0.01)
+            else:
+                db_free = 0
+                db.coll.insert_one(info_dict)
+                db_free = 1
+            connect.close()
+            browser.quit()
+            return 0
+
+    except Exception as exception:
+        print("Error has occured in: " + str(page_id))
+        print(exception)
+        browser.quit()
+        return exception
+
+
+if __name__=="__main__":
+    import multiprocessing as mp
+    num_of_cores = mp.cpu_count()
+    print('Start execution with ' + str(num_of_cores) + ' cores.')
+    pool = mp.Pool(processes=num_of_cores)
+    pool.starmap(crawler, list(tuple((i + initial_id, i)) for i in range(0, 20)))
+
+
+print('Parsing is done!!!')
+
