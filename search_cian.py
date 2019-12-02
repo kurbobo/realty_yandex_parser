@@ -103,7 +103,7 @@ def crawler(page_id):
 					element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector("g.highcharts-label.highcharts-tooltip.highcharts-color-undefined")))
 					element_list += ["\n"]
 			except:
-				print("No info about visitors in ad: " + str(page_ad))
+				print("No info about visitors in ad: " + str(page_id))
 			element_str = "".join(element_list)
 			for text in element_list:
 				output_file.write(text + '\n')
