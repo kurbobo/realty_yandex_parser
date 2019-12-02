@@ -15,7 +15,7 @@ chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument("no-sandbox")
 chrome_options.add_argument("--disable-extensions")
 chrome_options.add_argument("--disable-dev-shm-usage")
-#chrome_options.add_argument("--headless")
+chrome_options.add_argument("--headless")
 driver = os.path.join("/usr/local/bin","chromedriver")
 prefs = {'disk-cache-size': 4096}
 chrome_options.add_experimental_option("prefs", prefs)
@@ -30,7 +30,6 @@ initial_id = 220833621
 num_of_nodes = 2
 
 def parser(flat_string):
-	total_price, price_per_sq_meter = price_parser(flat_string)
 	bathroom_num, bathroom_separate = bathroom_parser(flat_string)
 	city, district,  municipal, street, building = address_parser(flat_string)
 	element_dict = {'id': id_num_parser(flat_string),
@@ -42,8 +41,8 @@ def parser(flat_string):
 					'storey_number': storey_number_parser(flat_string),
 					'whole_storey_number': whole_storeys_parser(flat_string),
 					'Building_year': building_year_parser(flat_string),
-					'total_price': int(total_price),
-					'price_per_sq_meter': int(price_per_sq_meter),
+					'total_price': total_price_parser(flat_string),
+					'price_per_sq_meter': price_per_sq_meter_parser(flat_string),
 					'city' : city,
 					'district' : district,
 					'municipal' : municipal,

@@ -105,14 +105,24 @@ def building_year_parser(flat_string):
 	return building_year
 
 
-def price_parser(flat_string):
-	reg_for_price = re.search(r'\d+\s*\d*\s*\d*\s*₽\s*'*2, flat_string)
-	if bool(reg_for_price)==False:
-		price, dens = None, None
+def total_price_parser(flat_string):
+	reg_for_total_price = re.search(r'\d+\s*\d*\s*\d*\s*₽\s*'*2, flat_string)
+	if bool(reg_for_total_price)==False:
+		total_price = None
 	else:
-		fin = reg_for_price.group(0).replace(' ','').replace('\n','').split('₽')
-		price, dens =fin[0] , fin[1] 
-	return price, dens
+		fin = reg_for_total_price.group(0).replace(' ','').replace('\n','').split('₽')
+		total_price = int(fin[0])
+	return total_price
+
+
+def price_per_sq_meter_parser(flat_string):
+	reg_for_price_per_sq_meter = re.search(r'\d+\s*\d*\s*\d*\s*₽\s*'*2, flat_string)
+	if bool(reg_for_price_per_sq_meter)==False:
+		price_per_sq_meter = None
+	else:
+		fin = reg_for_price_per_sq_meter.group(0).replace(' ','').replace('\n','').split('₽')
+		price_per_sq_meter = int(fin[1])
+	return price_per_sq_meter
 
 
 def seiling_hight_parser(flat_string):
