@@ -31,7 +31,6 @@ num_of_nodes = 2
 
 def parser(flat_string):
 	bathroom_num, bathroom_separate = bathroom_parser(flat_string)
-	city, district,  municipal, street, building = address_parser(flat_string)
 	element_dict = {'id': id_num_parser(flat_string),
 					'Number_of_rooms': number_of_rooms_parser(flat_string),
 					'housing_complex': housing_complex_parser(flat_string),
@@ -43,11 +42,7 @@ def parser(flat_string):
 					'Building_year': building_year_parser(flat_string),
 					'total_price': total_price_parser(flat_string),
 					'price_per_sq_meter': price_per_sq_meter_parser(flat_string),
-					'city' : city,
-					'district' : district,
-					'municipal' : municipal,
-					'street' : street,
-					'building' : building,
+					'address' : address_parser(flat_string),
 					'type_of_flat':type_of_flat_parser(flat_string),
 					'сeiling_height': seiling_hight_parser(flat_string),
 					'bathroom_number': bathroom_num,
@@ -63,8 +58,8 @@ def parser(flat_string):
 					'room1_square': room1_square_parser(flat_string),
 					'room2_square': room2_square_parser(flat_string),
 					'room3_square': room3_square_parser(flat_string),
-					'latitude': latitude(city, street, building),
-					'longitude': longitude(city, street, building),
+					'latitude': latitude(address_parser(flat_string)),
+					'longitude': longitude(address_parser(flat_string)),
 					'visitors' : visitors_parser(flat_string),
 					'date_of_place': date_of_place_parser(flat_string),
 					'total_number_views': total_number_views_parser(flat_string)}

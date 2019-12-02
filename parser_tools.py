@@ -17,14 +17,13 @@ def housing_complex_parser(flat_string):
 def address_parser(flat_string):
 	reg_for_address = re.search(r'address:\n.+', flat_string)
 	if bool(reg_for_address)==False:
-		city = district = municipal = street = building = None
+		address_list = None
 	else:
 		reg_for_address = reg_for_address.group(0)
 		for name in correct_building_name:
 			reg_for_address = reg_for_address.replace(name, '')
-		adress_list = reg_for_address.split(',')
-		city, district, municipal, street, building = adress_list[0], adress_list[1], adress_list[2], adress_list[-2], adress_list[-1]
-	return city, district, municipal, street, building
+		address_list = reg_for_address.split(',')
+	return address_list
 
 
 def number_of_rooms_parser(flat_string):
@@ -273,8 +272,8 @@ def building_for_coordinates(building):
 	return building_correct
 
 
-def latitude(city, street, building):
-	place = city + ',' + street + ',' + building_for_coordinates(building)
+def latitude(address):
+	place = str(address[0]) + ',' + str(address[-2]) + ',' + building_for_coordinates(str(address[-1]))
 	nom = Nominatim()
 	n = nom.geocode(place)
 	if n is None:
@@ -283,8 +282,8 @@ def latitude(city, street, building):
 		return n.latitude
 
 
-def longitude(city, street, building):
-	place = city + ',' + street + ',' + building_for_coordinates(building)
+def longitude(address):
+	place = str(address[0]) + ',' + str(address[-2]) + ',' + building_for_coordinates(str(address[-1]))
 	nom = Nominatim()
 	n = nom.geocode(place)
 	if n is None:
