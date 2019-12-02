@@ -137,7 +137,9 @@ if __name__=="__main__":
 	num_of_cores = mp.cpu_count()
 	print('Start execution with ' + str(num_of_cores) + ' cores.')
 	pool = mp.Pool(processes=num_of_cores)
-	pool.starmap(crawler, list(tuple((i + initial_id, i)) for i in range(0, 20)))
+	for cluster in range(0, 100):
+		pool.starmap(crawler, list(tuple((i + initial_id, i)) for i in range(0, 1000)))
+		print('Done parsing ' + str(cluster) + ' thousands!!!')
 
 
 print('Parsing is done!!!')
