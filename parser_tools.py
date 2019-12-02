@@ -334,3 +334,5 @@ def total_number_views_parser(flat_string):
 		except:
 			total_number_views = None
 	return total_number_views
+def removeNonAscii(s):
+    return "".join(i for i in s if ord(i)<128)
