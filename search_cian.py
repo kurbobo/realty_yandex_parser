@@ -1,8 +1,5 @@
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.chrome.options import Options
-from time import clock
-import pandas as pd
 from parser_tools import *
 import pymongo
 import time
@@ -138,7 +135,6 @@ def download_data(page_id):
 
 if __name__=="__main__":
 	import multiprocessing as mp
-	print("ololo")
 	pool = mp.Pool(processes=num_of_nodes)
 	pool.starmap(crawler, list(tuple((i + initial_id, i)) for i in range(0, 20)))
 
