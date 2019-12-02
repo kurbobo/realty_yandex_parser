@@ -79,12 +79,21 @@ def type_of_flat_parser(flat_string):
 
 
 def storey_number_parser(flat_string):
-	reg_for_liv_ar = re.search(r'\d+\s+из\s+\d+\s*Этаж', flat_string)
-	if bool(reg_for_liv_ar)==False:
+	reg_for_storey_number = re.search(r'\d+\s+из\s+\d+\s*Этаж', flat_string)
+	if bool(reg_for_storey_number)==False:
 		storey_number = None, None
 	else:
-		storey_number = reg_for_liv_ar.group(0).split()[0], reg_for_liv_ar.group(0).split()[2]
+		storey_number = reg_for_storey_number.group(0).split()[0]
 	return storey_number
+
+
+def whole_storeys_parser(flat_string):
+	reg_for_whole_storeys = re.search(r'\d+\s+из\s+\d+\s*Этаж', flat_string)
+	if bool(reg_for_whole_storeys)==False:
+		whole_storeys = None, None
+	else:
+		whole_storeys = reg_for_whole_storeys.group(0).split()[2]
+	return whole_storeys
 
 
 def building_year_parser(flat_string):
