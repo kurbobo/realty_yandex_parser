@@ -25,15 +25,12 @@ def pars_price_range(browser):
     try:
         price_range = browser.find_element_by_css_selector('a.a10a3f92e9--price_range-link--3Kdo-').text
         price_range = removeNonAscii(str(price_range))
-        print('price_range = ', price_range)
         k_max=0
         for k in range(len(price_range),1,-1):
             if k*' ' in price_range:
                 k_max = k
                 break
-        print('price_range = ', price_range)
         price_range = price_range.split(k_max*' ')
-        print('price_range = ', price_range)
         price_range = list(map(lambda x: int(x.replace(' ', '')), price_range))
     except NoSuchElementException:
             price_range = None
@@ -49,18 +46,14 @@ def pars_house_analytics(browser):
         price, rent = house.find_elements_by_css_selector("div.a10a3f92e9--average--ITlDQ")
 
         price_list = list(map(lambda x: removeNonAscii(str(x.text.replace(' ', ''))), price.find_elements_by_css_selector('*')))
-        print('price_list = ', price_list)
         price_list = list(filter(lambda a: a != '', price_list))
-        print('price_list = ', price_list)
         for i in price_list:
             if not re.search(r'%\d+', i) is None and i in price_list:
                 price_list.remove(i)
-        print('price_list = ', price_list)
         price_list = list(map(lambda x: float(x.replace('%', '').replace(',', '.')),price_list))
-        print('price_list = ', price_list)
         purchase_price, purchase_dynamics = price_list
-
         rent = list(map(lambda x: removeNonAscii(str(x.text.replace(' ', ''))), rent.find_elements_by_css_selector('*')))
+        print('rent = ', rent)
         rent_list = []
         rent = list(filter(lambda a: a != '', rent))
         for i in rent:
@@ -69,6 +62,7 @@ def pars_house_analytics(browser):
         rent_price, rent_dynamics = list(map(lambda x: float(x.replace('%', '').replace(',', '.').replace('/', '')),rent_list))
     except NoSuchElementException:
         purchase_price, purchase_dynamics, rent_price, rent_dynamics = [None, None,None, None]
+    return purchase_price, purchase_dynamics, rent_price, rent_dynamics
         
         
         
@@ -79,23 +73,16 @@ def pars_district_analytics(browser):
         price_per_m, price_per_h, month_rent = house.find_elements_by_css_selector("div.a10a3f92e9--average--ITlDQ")
 
         price_per_m_list = list(map(lambda x: removeNonAscii(str(x.text.replace(' ', ''))), price_per_m.find_elements_by_css_selector('*')))
-        print('price_per_m_list = ', price_per_m_list)
         price_per_m_list = list(filter(lambda a: a != '', price_per_m_list))
-        print('price_per_m_list = ', price_per_m_list)
         for i in price_per_m_list:
             if not re.search(r'%\d+', i) is None and i in price_per_m_list:
                 price_per_m_list.remove(i)
-        print('price_per_m_list = ', price_per_m_list)
         price_per_m_list = list(map(lambda x: float(x.replace('%', '').replace(',', '.')),price_per_m_list))
-        print('price_per_m_list = ', price_per_m_list)
         price_per_m, price_per_m_dynamics = price_per_m_list
 
         price_per_h_list = list(map(lambda x: removeNonAscii(str(x.text.replace(' ', ''))), price_per_h.find_elements_by_css_selector('*')))
-        print('price_per_h_list = ', price_per_h_list)
         price_per_h_list = list(filter(lambda a: a != '' and re.search(r'%\d+', a) is None and not '.' in a, price_per_h_list))
-        print('price_per_h_list = ', price_per_h_list)
         price_per_h_list = list(map(lambda x: float(x.replace('%', '').replace(',', '.')),price_per_h_list))
-        print('price_per_h_list = ', price_per_h_list)
         price_per_h, price_per_h_dynamics = price_per_h_list
         
         
@@ -182,9 +169,9 @@ def download_data(page_id):
             element_list += ["ID_num: " + str(page_id)]
             element_list += ["\n"]
             purchase_price, purchase_dynamics, rent_price, rent_dynamics = pars_house_analytics(browser)
-#             # dst = district
-#             price_per_meter_in_dst, price_per_meter_in_dst_dynamics, price_per_h_in_dst, price_per_h_in_dst_dynamics, 
-#             rent_price_in_dst, rent_dynamics_in_dst = pars_district_analytics(browser)
+            # dst = district
+            price_per_meter_in_dst, price_per_meter_in_dst_dynamics, price_per_house_in_dst, price_per_house_in_dst_dynamics, rent_price_in_dst, rent_dynamics_in_dst = pars_district_analytics(browser)
+            price_range = pars_price_range(browser)
             try:
                 browser.find_element_by_css_selector('a.a10a3f92e9--link--1t8n1.a10a3f92e9--link--2mJJk').click()
                 time.sleep(0.5)
@@ -202,7 +189,7 @@ def download_data(page_id):
                 output_file.write(text + '\n')
             output_file.write('-------------------------------------------------------------------------\n')
             info_dict = parser(element_str)
-            info_dict['price_range'] = pars_price_range(browser)
+            info_dict['price_range'] = price_range
             info_dict['purchase_price'] = purchase_price
             info_dict['purchase_dynamics'] = purchase_dynamics
             info_dict['rent_price'] = rent_price
@@ -242,7 +229,7 @@ def download_data(page_id):
 
 if __name__=="__main__":
     import multiprocessing as mp
-    num_of_cores = 1# mp.cpu_count()
+    num_of_cores = 1#mp.cpu_count()
     print('Start execution with ' + str(num_of_cores) + ' cores.')
     pool = mp.Pool(processes=num_of_cores)
     pool.starmap(crawler, list(tuple((i + initial_id, i)) for i in range(0, 20)))
