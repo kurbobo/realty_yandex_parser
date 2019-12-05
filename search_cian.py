@@ -2,8 +2,10 @@ from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException
 from parser_tools import *
+# from tor_proxy import *
 import pymongo
 import time
+import random
 import os
 
 
@@ -53,7 +55,6 @@ def pars_house_analytics(browser):
         price_list = list(map(lambda x: float(x.replace('%', '').replace(',', '.')),price_list))
         purchase_price, purchase_dynamics = price_list
         rent = list(map(lambda x: removeNonAscii(str(x.text.replace(' ', ''))), rent.find_elements_by_css_selector('*')))
-        print('rent = ', rent)
         rent_list = []
         rent = list(filter(lambda a: a != '', rent))
         for i in rent:
@@ -133,9 +134,9 @@ def parser(flat_string):
                     'date_of_place': date_of_place_parser(flat_string),
                     'total_number_views': total_number_views_parser(flat_string)}
     return element_dict
-
-
+    
 def crawler(page_id, page_num):
+    time.sleep(4*random.random())
     stop_trying = 0
     while(str(download_data(page_id)) == 'Service timed out' and stop_trying < 10):
         stop_trying += 1
@@ -145,6 +146,8 @@ def crawler(page_id, page_num):
             print('Stop trying to download ad num:' + str(page_id))
 
     print('Ad with number: ' + str(page_num) + ' finished parsing.')
+    
+    ''' increment the global counter, do something with the input '''
 
 
 
@@ -194,7 +197,6 @@ def download_data(page_id):
             info_dict['purchase_dynamics'] = purchase_dynamics
             info_dict['rent_price'] = rent_price
             info_dict['rent_dynamics'] = rent_dynamics
-
             info_dict['price_per_meter_in_dst'] = price_per_meter_in_dst
             info_dict['price_per_meter_in_dst_dynamics'] = price_per_meter_in_dst_dynamics
             info_dict['price_per_house_in_dst'] = price_per_house_in_dst
@@ -219,7 +221,9 @@ def download_data(page_id):
             connect.close()
             browser.quit()
             return 0
-
+    except TypeError:
+        time.sleep(4*random.random())
+        browser.quit()
     except Exception as exception:
         print("Error has occured in: " + str(page_id))
         print(exception)
@@ -229,10 +233,12 @@ def download_data(page_id):
 
 if __name__=="__main__":
     import multiprocessing as mp
-    num_of_cores = 1#mp.cpu_count()
+    num_of_cores = 30
     print('Start execution with ' + str(num_of_cores) + ' cores.')
     pool = mp.Pool(processes=num_of_cores)
-    pool.starmap(crawler, list(tuple((i + initial_id, i)) for i in range(0, 20)))
+    for cluster in range(0, 100):
+        pool.starmap(crawler, list(tuple((-i + initial_id - 1000*cluster, i + 1000*cluster)) for i in range(0, 1000)))
+        print('Done parsing ' + str(cluster) + ' thousands!!!')
 
 
 print('Parsing is done!!!')
