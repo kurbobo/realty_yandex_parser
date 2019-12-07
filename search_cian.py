@@ -226,7 +226,9 @@ def download_data(page_id):
         browser.quit()
     except Exception as exception:
         print("Error has occured in: " + str(page_id))
-        print(exception)
+#         print(exception)
+        f= open("errors.txt","a+")
+        f.write(str(page_id) + "\n")
         browser.quit()
         return exception
 
@@ -235,9 +237,10 @@ if __name__=="__main__":
     import multiprocessing as mp
     num_of_cores = 30
     print('Start execution with ' + str(num_of_cores) + ' cores.')
-    pool = mp.Pool(processes=num_of_cores)
-    for cluster in range(0, 100):
-        pool.starmap(crawler, list(tuple((-i + initial_id - 1000*cluster, i + 1000*cluster)) for i in range(0, 1000)))
+    elenemts_in_cluster = 1000
+    for cluster in range(4, 100):
+        with mp.Pool(processes=num_of_cores) as pool:
+            pool.starmap(crawler, list(tuple((-i + initial_id - elenemts_in_cluster*cluster, i + elenemts_in_cluster*cluster)) for i in range(0, elenemts_in_cluster)))
         print('Done parsing ' + str(cluster) + ' thousands!!!')
 
 
