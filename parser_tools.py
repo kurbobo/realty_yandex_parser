@@ -3,7 +3,7 @@ from geopy.geocoders import Nominatim
 import datetime
 from datetime import timedelta
 
-correct_building_name = ['address:\n', 'р-н ', 'На карте', 'дор. ', 'просп.', 'ул.']
+correct_building_name = ['address:\n', 'р-н ', 'На карте', 'дор. ', 'просп.', 'ул.', 'наб.', 'ш.', 'пер.']
 
 
 def housing_complex_parser(flat_string):
@@ -125,12 +125,20 @@ def price_per_sq_meter_parser(flat_string):
 
 
 def seiling_hight_parser(flat_string):
-	reg_for_ceiling_height = re.search(r'Высота потолков\s+\w+', flat_string)
-	if bool(reg_for_ceiling_height)==False:
-		ceiling_height = None
-	else:
-		ceiling_height = float(reg_for_ceiling_height.group(0).split()[-1])
-	return ceiling_height
+    try:
+        reg_for_ceiling_height = re.search(r'Высота потолков\s+\w+', flat_string)
+        if bool(reg_for_ceiling_height)==False:
+            ceiling_height = None
+        else:
+            try:
+                ceiling_height = float(reg_for_ceiling_height.group(0).split()[-1])
+            except UnicodeEncodeError:
+                print('UnicodeEncodeError in porch_num_parser')
+                print(removeNonAscii(reg_for_ceiling_height.group(0)))
+                reg_for_ceiling_height = int(removeNonAscii(reg_for_ceiling_height.group(0)).split()[-1])
+        return reg_for_ceiling_height
+    except:
+        return None
 
 
 def bathroom_num_parser(flat_string):
@@ -179,12 +187,21 @@ def ceiling_type_parser(flat_string):
 
 
 def porch_num_parser(flat_string):
-	reg_for_porch_num = re.search(r'Подъезды\s+\w+', flat_string)
-	if bool(reg_for_porch_num)==False:
-		porch_num = None
-	else:
-		porch_num = int(reg_for_porch_num.group(0).split()[-1])
-	return porch_num
+    try:
+        reg_for_porch_num = re.search(r'Подъезды\s+\w+', flat_string)
+        if bool(reg_for_porch_num)==False:
+            porch_num = None
+        else:
+            try:
+                porch_num = int(reg_for_porch_num.group(0).split()[-1])
+            except UnicodeEncodeError:
+                print('UnicodeEncodeError in porch_num_parser')
+                print(removeNonAscii(reg_for_porch_num.group(0)))
+                porch_num = int(removeNonAscii(reg_for_porch_num.group(0)).split()[-1])
+        return porch_num
+    except:
+        return None
+        
 
 
 def central_heating_parser(flat_string):
@@ -284,7 +301,13 @@ def latitude(address):
 	nom = Nominatim()
 	n = nom.geocode(place)
 	if n is None:
-		return None
+		place = str(address[0]) + ',' + str(address[-3]) + ',' + building_for_coordinates(str(address[-2]))
+		nom = Nominatim()
+		n = nom.geocode(place)
+		if n is None:
+			return None
+		else:
+			return n.latitude
 	else:
 		return n.latitude
 
@@ -294,8 +317,16 @@ def longitude(address):
 	nom = Nominatim()
 	n = nom.geocode(place)
 	if n is None:
-		return None
+		place = str(address[0]) + ',' + str(address[-3]) + ',' + building_for_coordinates(str(address[-2]))
+		nom = Nominatim()
+		n = nom.geocode(place)
+		if n is None:
+			return None
+		else:
+			print('longitude =', n.longitude)
+			return n.longitude
 	else:
+		print('longitude =', n.longitude)
 		return n.longitude
 
 

@@ -21,8 +21,8 @@ prefs = {'disk-cache-size': 4096}
 chrome_options.add_experimental_option("prefs", prefs)
 
 db_free = 1
-initial_id = 221361553
-
+#initial_id = 221361553
+initial_id = 221331782
 def pars_price_range(browser):
     try:
         price_range = browser.find_element_by_css_selector('a.a10a3f92e9--price_range-link--3Kdo-').text
@@ -136,15 +136,20 @@ def parser(flat_string):
     return element_dict
     
 def crawler(page_id, page_num):
+    print('start crawler')
     time.sleep(4*random.random())
     stop_trying = 0
+    start_time = time.process_time()
     while(str(download_data(page_id)) == 'Service timed out' and stop_trying < 10):
+        if (time.process_time() - start_time>5*60):
+            print('took time more than 5 mins')
+            break
         stop_trying += 1
         if (stop_trying < 10):
             print('Restarting this process.')
         else:
             print('Stop trying to download ad num:' + str(page_id))
-
+        print('time is ', str(time.process_time() - start_time))
     print('Ad with number: ' + str(page_num) + ' finished parsing.')
     
     ''' increment the global counter, do something with the input '''
@@ -153,6 +158,7 @@ def crawler(page_id, page_num):
 
 
 def download_data(page_id):
+    print('start download_data')
     try:
         with open( 'ads_texts/'+ str(page_id) + '.txt', 'a', encoding='utf-8') as output_file:
             browser = webdriver.Chrome(options=chrome_options)
@@ -203,6 +209,7 @@ def download_data(page_id):
             info_dict['price_per_house_in_dst_dynamics'] = price_per_house_in_dst_dynamics
             info_dict['rent_price_in_dst'] = rent_price_in_dst
             info_dict['rent_dynamics_in_dst'] = rent_dynamics_in_dst
+			info_dict['cian_id'] = page_id
             info_dict.update( {'pic_urls' : list(map(lambda x: x.get_attribute("src"), browser.find_elements_by_css_selector('img.fotorama__img')))})
             # соединяемся с сервером базы данных
             # (по умолчанию подключение осуществляется на localhost:27017)
@@ -237,8 +244,8 @@ if __name__=="__main__":
     import multiprocessing as mp
     num_of_cores = 30
     print('Start execution with ' + str(num_of_cores) + ' cores.')
-    elenemts_in_cluster = 1000
-    for cluster in range(4, 100):
+    elenemts_in_cluster = 3000
+    for cluster in range(0, 100):
         with mp.Pool(processes=num_of_cores) as pool:
             pool.starmap(crawler, list(tuple((-i + initial_id - elenemts_in_cluster*cluster, i + elenemts_in_cluster*cluster)) for i in range(0, elenemts_in_cluster)))
         print('Done parsing ' + str(cluster) + ' thousands!!!')
