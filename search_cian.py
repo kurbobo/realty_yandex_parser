@@ -211,12 +211,12 @@ def download_data(page_id):
             info_dict['price_per_house_in_dst_dynamics'] = price_per_house_in_dst_dynamics
             info_dict['rent_price_in_dst'] = rent_price_in_dst
             info_dict['rent_dynamics_in_dst'] = rent_dynamics_in_dst
-			info_dict['cian_id'] = page_id
+            info_dict['cian_id'] = page_id
             info_dict.update( {'pic_urls' : list(map(lambda x: x.get_attribute("src"), browser.find_elements_by_css_selector('img.fotorama__img')))})
             # соединяемся с сервером базы данных
             # (по умолчанию подключение осуществляется на localhost:27017)
             connect = pymongo.MongoClient('localhost', 27017, maxPoolSize=200)
-            # выбираем базу данных
+			# выбираем базу данных
             db = connect.flats
             # выбираем коллекцию документов
             db.user
@@ -244,13 +244,13 @@ def download_data(page_id):
 
 if __name__=="__main__":
     import multiprocessing as mp
-    num_of_cores = 30
+    num_of_cores = mp.cpu_count()
     print('Start execution with ' + str(num_of_cores) + ' cores.')
-    elenemts_in_cluster = 3000
-    for cluster in range(0, 100):
-        with mp.Pool(processes=num_of_cores) as pool:
-            pool.starmap(crawler, list(tuple((-i + initial_id - elenemts_in_cluster*cluster, i + elenemts_in_cluster*cluster)) for i in range(0, elenemts_in_cluster)))
-        print('Done parsing ' + str(cluster) + ' thousands!!!')
+    pool = mp.Pool()
+    for ad in range(100000):
+        pool.apply_async(crawler, args=(initial_id + ad, ad))
+    pool.close()
+    pool.join()
 
 
 print('Parsing is done!!!')
