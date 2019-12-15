@@ -367,3 +367,12 @@ def total_number_views_parser(flat_string):
 	return total_number_views
 def removeNonAscii(s):
     return "".join(i for i in s if ord(i)<128)
+
+
+def active_parser(flat_string):
+	reg_active = re.search(r'Объявление снято с публикации', flat_string)
+	if bool(reg_active)==True:
+		central_heating = False
+	else:
+		central_heating = True
+	return central_heating
