@@ -2,7 +2,8 @@ from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException
 from parser_tools import *
-# from tor_proxy import *
+from tbselenium.tbdriver import TorBrowserDriver
+from tbselenium.utils import start_xvfb, stop_xvfb
 import pymongo
 import time
 import random
@@ -11,18 +12,16 @@ import os
 
 number_of_pages = 200
 open('cian.txt','w').close()
-chrome_options = webdriver.ChromeOptions()
-chrome_options.add_argument("no-sandbox")
-chrome_options.add_argument("--disable-extensions")
-chrome_options.add_argument("--disable-dev-shm-usage")
-chrome_options.add_argument("--headless")
-driver = os.path.join("/usr/local/bin","chromedriver")
-prefs = {'disk-cache-size': 4096}
-chrome_options.add_experimental_option("prefs", prefs)
+# chrome_options = webdriver.ChromeOptions()
+# chrome_options.add_argument("no-sandbox")
+# chrome_options.add_argument("--disable-extensions")
+# chrome_options.add_argument("--disable-dev-shm-usage")
+# chrome_options.add_argument("--headless")
+# driver = os.path.join("/usr/local/bin","chromedriver")
+# prefs = {'disk-cache-size': 4096}
+# chrome_options.add_experimental_option("prefs", prefs)
 
-db_free = 1
-#initial_id = 221361553
-initial_id = 221331782
+tbb_dir = "/home/jovyan/work/tor-browser_en-US"
 def pars_price_range(browser):
     try:
         price_range = browser.find_element_by_css_selector('a.a10a3f92e9--price_range-link--3Kdo-').text
@@ -164,7 +163,9 @@ def download_data(page_id):
     print('start download_data')
     try:
         with open( 'ads_texts/'+ str(page_id) + '.txt', 'a', encoding='utf-8') as output_file:
-            browser = webdriver.Chrome(options=chrome_options)
+            xvfb_display = start_xvfb()
+            # browser = webdriver.Chrome(options=chrome_options)
+            browser = TorBrowserDriver(tbb_dir)
             # Get the URL of next page to be parsed
             browser.get("https://spb.cian.ru/sale/flat/" + str(page_id) + "/")
 
@@ -232,22 +233,24 @@ def download_data(page_id):
                 db_free = 1
             connect.close()
             browser.quit()
+            stop_xvfb(xvfb_display)
             return 0
     except TypeError:
         time.sleep(4*random.random())
         browser.quit()
     except Exception as exception:
         print("Error has occured in: " + str(page_id))
-#         print(exception)
+        print(exception)
         f= open("errors.txt","a+")
         f.write(str(page_id) + "\n")
         browser.quit()
+        stop_xvfb(xvfb_display)
         return exception
 
 
 if __name__=="__main__":
     import multiprocessing as mp
-    num_of_cores = mp.cpu_count()
+    num_of_cores = mp.cpu_count()//2
     print('Start execution with ' + str(num_of_cores) + ' cores.')
     pool = mp.Pool()
     for ad in range(100000):
