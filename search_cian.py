@@ -2,25 +2,26 @@ from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException
 from parser_tools import *
+from tbselenium.tbdriver import TorBrowserDriver
+from tbselenium.utils import start_xvfb, stop_xvfb
 import pymongo
 import time
+import random
 import os
 
 
 number_of_pages = 200
 open('cian.txt','w').close()
-chrome_options = webdriver.ChromeOptions()
-chrome_options.add_argument("no-sandbox")
-chrome_options.add_argument("--disable-extensions")
-chrome_options.add_argument("--disable-dev-shm-usage")
-chrome_options.add_argument("--headless")
-driver = os.path.join("/usr/local/bin","chromedriver")
-prefs = {'disk-cache-size': 4096}
-chrome_options.add_experimental_option("prefs", prefs)
+# chrome_options = webdriver.ChromeOptions()
+# chrome_options.add_argument("no-sandbox")
+# chrome_options.add_argument("--disable-extensions")
+# chrome_options.add_argument("--disable-dev-shm-usage")
+# chrome_options.add_argument("--headless")
+# driver = os.path.join("/usr/local/bin","chromedriver")
+# prefs = {'disk-cache-size': 4096}
+# chrome_options.add_experimental_option("prefs", prefs)
 
-db_free = 1
-initial_id = 221361553
-
+tbb_dir = "/home/jovyan/work/tor-browser_en-US"
 def pars_price_range(browser):
     try:
         price_range = browser.find_element_by_css_selector('a.a10a3f92e9--price_range-link--3Kdo-').text
@@ -52,7 +53,6 @@ def pars_house_analytics(browser):
                 price_list.remove(i)
         price_list = list(map(lambda x: float(x.replace('%', '').replace(',', '.')),price_list))
         purchase_price, purchase_dynamics = price_list
-
         rent = list(map(lambda x: removeNonAscii(str(x.text.replace(' ', ''))), rent.find_elements_by_css_selector('*')))
         rent_list = []
         rent = list(filter(lambda a: a != '', rent))
@@ -62,8 +62,45 @@ def pars_house_analytics(browser):
         rent_price, rent_dynamics = list(map(lambda x: float(x.replace('%', '').replace(',', '.').replace('/', '')),rent_list))
     except NoSuchElementException:
         purchase_price, purchase_dynamics, rent_price, rent_dynamics = [None, None,None, None]
-
     return purchase_price, purchase_dynamics, rent_price, rent_dynamics
+        
+        
+        
+def pars_district_analytics(browser):
+    try:
+        header = browser.find_element_by_css_selector("div.a10a3f92e9--averages--3nUh3")
+        house = header.find_elements_by_css_selector("div.a10a3f92e9--wrapper--2U64R")[1]
+        price_per_m, price_per_h, month_rent = house.find_elements_by_css_selector("div.a10a3f92e9--average--ITlDQ")
+
+        price_per_m_list = list(map(lambda x: removeNonAscii(str(x.text.replace(' ', ''))), price_per_m.find_elements_by_css_selector('*')))
+        price_per_m_list = list(filter(lambda a: a != '', price_per_m_list))
+        for i in price_per_m_list:
+            if not re.search(r'%\d+', i) is None and i in price_per_m_list:
+                price_per_m_list.remove(i)
+        price_per_m_list = list(map(lambda x: float(x.replace('%', '').replace(',', '.')),price_per_m_list))
+        price_per_m, price_per_m_dynamics = price_per_m_list
+
+        price_per_h_list = list(map(lambda x: removeNonAscii(str(x.text.replace(' ', ''))), price_per_h.find_elements_by_css_selector('*')))
+        price_per_h_list = list(filter(lambda a: a != '' and re.search(r'%\d+', a) is None and not '.' in a, price_per_h_list))
+        price_per_h_list = list(map(lambda x: float(x.replace('%', '').replace(',', '.')),price_per_h_list))
+        price_per_h, price_per_h_dynamics = price_per_h_list
+        
+        
+        
+        month_rent = list(map(lambda x: removeNonAscii(str(x.text.replace(' ', ''))), month_rent.find_elements_by_css_selector('*')))
+        rent_list = []
+        month_rent = list(filter(lambda a: a != '', month_rent))
+        for i in month_rent:
+            if re.search(r'%\d+', i) is None and '.' not in i:
+                rent_list.append(i)
+        rent_price, rent_dynamics = list(map(lambda x: float(x.replace('%', '').replace(',', '.').replace('/', '')),rent_list))
+    except NoSuchElementException:
+        price_per_m, price_per_m_dynamics, price_per_h, price_per_h_dynamics, rent_price, rent_dynamics = [None, None,None, None,None, None]
+    return price_per_m, price_per_m_dynamics, price_per_h, price_per_h_dynamics, rent_price, rent_dynamics
+
+db_free = 1
+initial_id = 220833621
+
 def parser(flat_string):
     element_dict = {'id': id_num_parser(flat_string),
                     'Number_of_rooms': number_of_rooms_parser(flat_string),
@@ -96,28 +133,39 @@ def parser(flat_string):
                     'longitude': longitude(address_parser(flat_string)),
                     'visitors' : visitors_parser(flat_string),
                     'date_of_place': date_of_place_parser(flat_string),
-                    'total_number_views': total_number_views_parser(flat_string)}
+                    'total_number_views': total_number_views_parser(flat_string),
+                    'active': active_parser(flat_string)}
     return element_dict
-
-
+    
 def crawler(page_id, page_num):
+    print('start crawler')
+    time.sleep(4*random.random())
     stop_trying = 0
+    start_time = time.process_time()
     while(str(download_data(page_id)) == 'Service timed out' and stop_trying < 10):
+        if (time.process_time() - start_time>5*60):
+            print('took time more than 5 mins')
+            break
         stop_trying += 1
         if (stop_trying < 10):
             print('Restarting this process.')
         else:
             print('Stop trying to download ad num:' + str(page_id))
-
+        print('time is ', str(time.process_time() - start_time))
     print('Ad with number: ' + str(page_num) + ' finished parsing.')
+    
+    ''' increment the global counter, do something with the input '''
 
 
 
 
 def download_data(page_id):
+    print('start download_data')
     try:
         with open( 'ads_texts/'+ str(page_id) + '.txt', 'a', encoding='utf-8') as output_file:
-            browser = webdriver.Chrome(options=chrome_options)
+            xvfb_display = start_xvfb()
+            # browser = webdriver.Chrome(options=chrome_options)
+            browser = TorBrowserDriver(tbb_dir)
             # Get the URL of next page to be parsed
             browser.get("https://spb.cian.ru/sale/flat/" + str(page_id) + "/")
 
@@ -133,13 +181,12 @@ def download_data(page_id):
             element_list += ["\n"]
             element_list += ["ID_num: " + str(page_id)]
             element_list += ["\n"]
+            element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--container--1In69')))
+            element_list += ["\n"]
             purchase_price, purchase_dynamics, rent_price, rent_dynamics = pars_house_analytics(browser)
-            pars_price_ran = pars_price_range(browser)
-            print('pars_price_ran = ', pars_price_ran)
-            print('purchase_price =', purchase_price)
-            print('purchase_dynamics =', purchase_dynamics)
-            print('rent_price = ',rent_price)
-            print('rent_dynamics = ',rent_dynamics)
+            # dst = district
+            price_per_meter_in_dst, price_per_meter_in_dst_dynamics, price_per_house_in_dst, price_per_house_in_dst_dynamics, rent_price_in_dst, rent_dynamics_in_dst = pars_district_analytics(browser)
+            price_range = pars_price_range(browser)
             try:
                 browser.find_element_by_css_selector('a.a10a3f92e9--link--1t8n1.a10a3f92e9--link--2mJJk').click()
                 time.sleep(0.5)
@@ -157,11 +204,18 @@ def download_data(page_id):
                 output_file.write(text + '\n')
             output_file.write('-------------------------------------------------------------------------\n')
             info_dict = parser(element_str)
-            info_dict['price_range'] = pars_price_range(browser)
+            info_dict['price_range'] = price_range
             info_dict['purchase_price'] = purchase_price
             info_dict['purchase_dynamics'] = purchase_dynamics
             info_dict['rent_price'] = rent_price
             info_dict['rent_dynamics'] = rent_dynamics
+            info_dict['price_per_meter_in_dst'] = price_per_meter_in_dst
+            info_dict['price_per_meter_in_dst_dynamics'] = price_per_meter_in_dst_dynamics
+            info_dict['price_per_house_in_dst'] = price_per_house_in_dst
+            info_dict['price_per_house_in_dst_dynamics'] = price_per_house_in_dst_dynamics
+            info_dict['rent_price_in_dst'] = rent_price_in_dst
+            info_dict['rent_dynamics_in_dst'] = rent_dynamics_in_dst
+            info_dict['cian_id'] = page_id
             info_dict.update( {'pic_urls' : list(map(lambda x: x.get_attribute("src"), browser.find_elements_by_css_selector('img.fotorama__img')))})
             # соединяемся с сервером базы данных
             # (по умолчанию подключение осуществляется на localhost:27017)
@@ -179,21 +233,30 @@ def download_data(page_id):
                 db_free = 1
             connect.close()
             browser.quit()
+            stop_xvfb(xvfb_display)
             return 0
-
+    except TypeError:
+        time.sleep(4*random.random())
+        browser.quit()
     except Exception as exception:
         print("Error has occured in: " + str(page_id))
         print(exception)
+        f= open("errors.txt","a+")
+        f.write(str(page_id) + "\n")
         browser.quit()
+        stop_xvfb(xvfb_display)
         return exception
 
 
 if __name__=="__main__":
     import multiprocessing as mp
-    num_of_cores = mp.cpu_count()
+    num_of_cores = mp.cpu_count()//2
     print('Start execution with ' + str(num_of_cores) + ' cores.')
-    pool = mp.Pool(processes=num_of_cores)
-    pool.starmap(crawler, list(tuple((i + initial_id, i)) for i in range(0, 20)))
+    pool = mp.Pool()
+    for ad in range(100000):
+        pool.apply_async(crawler, args=(initial_id + ad, ad))
+    pool.close()
+    pool.join()
 
 
 print('Parsing is done!!!')
