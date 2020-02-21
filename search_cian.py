@@ -99,7 +99,7 @@ def pars_district_analytics(browser):
     return price_per_m, price_per_m_dynamics, price_per_h, price_per_h_dynamics, rent_price, rent_dynamics
 
 db_free = 1
-initial_id = 220833621
+initial_id = 220843621
 
 def parser(flat_string):
     element_dict = {'id': id_num_parser(flat_string),
@@ -142,7 +142,7 @@ def crawler(page_id, page_num):
     time.sleep(4*random.random())
     stop_trying = 0
     start_time = time.process_time()
-    while(str(download_data(page_id)) == 'Service timed out' and stop_trying < 10):
+    while( 'connection refused' in str(download_data(page_id)) and stop_trying < 10):
         if (time.process_time() - start_time>5*60):
             print('took time more than 5 mins')
             break
@@ -162,7 +162,7 @@ def crawler(page_id, page_num):
 def download_data(page_id):
     print('start download_data')
     try:
-        with open( 'ads_texts/'+ str(page_id) + '.txt', 'a', encoding='utf-8') as output_file:
+        with open( '/home/jovyan/work/alex-realty-parser/ads_texts/'+ str(page_id) + '.txt', 'a', encoding='utf-8') as output_file:
             xvfb_display = start_xvfb()
             # browser = webdriver.Chrome(options=chrome_options)
             browser = TorBrowserDriver(tbb_dir)
@@ -238,6 +238,7 @@ def download_data(page_id):
     except TypeError:
         time.sleep(4*random.random())
         browser.quit()
+        stop_xvfb(xvfb_display)
     except Exception as exception:
         print("Error has occured in: " + str(page_id))
         print(exception)
@@ -250,9 +251,10 @@ def download_data(page_id):
 
 if __name__=="__main__":
     import multiprocessing as mp
-    num_of_cores = mp.cpu_count()//2
+    num_of_cores = mp.cpu_count()//3
+    #num_of_cores = 4
     print('Start execution with ' + str(num_of_cores) + ' cores.')
-    pool = mp.Pool()
+    pool = mp.Pool(num_of_cores)
     for ad in range(100000):
         pool.apply_async(crawler, args=(initial_id + ad, ad))
     pool.close()
