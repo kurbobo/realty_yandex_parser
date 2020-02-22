@@ -21,7 +21,7 @@ open('cian.txt','w').close()
 # prefs = {'disk-cache-size': 4096}
 # chrome_options.add_experimental_option("prefs", prefs)
 
-tbb_dir = "/home/jovyan/work/tor-browser_en-US"
+tbb_dir = "../tor-browser_en-US"
 def pars_price_range(browser):
     try:
         price_range = browser.find_element_by_css_selector('a.a10a3f92e9--price_range-link--3Kdo-').text
@@ -99,7 +99,7 @@ def pars_district_analytics(browser):
     return price_per_m, price_per_m_dynamics, price_per_h, price_per_h_dynamics, rent_price, rent_dynamics
 
 db_free = 1
-initial_id = 220843621
+initial_id = 220833621
 
 def parser(flat_string):
     element_dict = {'id': id_num_parser(flat_string),
@@ -142,16 +142,20 @@ def crawler(page_id, page_num):
     time.sleep(4*random.random())
     stop_trying = 0
     start_time = time.process_time()
-    while( 'connection refused' in str(download_data(page_id)) and stop_trying < 10):
-        if (time.process_time() - start_time>5*60):
-            print('took time more than 5 mins')
-            break
-        stop_trying += 1
-        if (stop_trying < 10):
-            print('Restarting this process.')
+    while(stop_trying < 10):
+        try:
+            data = download_data(page_id)
+            #'connection refused' in str(download_data(page_id))
+            if data==0:
+                break
+        except Exception:
+            print('error occured on ' + str(stop_trying) + ' attempt in ' + str(page_id))
+            stop_trying += 1
         else:
-            print('Stop trying to download ad num:' + str(page_id))
-        print('time is ', str(time.process_time() - start_time))
+            if 'connection refused' not in str(data) or (time.process_time() - start_time>5*60):
+                print('took time more than 5 mins or connection refused')
+                break
+    print('time is ', str(time.process_time() - start_time))
     print('Ad with number: ' + str(page_num) + ' finished parsing.')
     
     ''' increment the global counter, do something with the input '''
@@ -162,7 +166,7 @@ def crawler(page_id, page_num):
 def download_data(page_id):
     print('start download_data')
     try:
-        with open( '/home/jovyan/work/alex-realty-parser/ads_texts/'+ str(page_id) + '.txt', 'a', encoding='utf-8') as output_file:
+        with open( 'ads_texts/'+ str(page_id) + '.txt', 'a', encoding='utf-8') as output_file:
             xvfb_display = start_xvfb()
             # browser = webdriver.Chrome(options=chrome_options)
             browser = TorBrowserDriver(tbb_dir)
@@ -251,8 +255,7 @@ def download_data(page_id):
 
 if __name__=="__main__":
     import multiprocessing as mp
-    num_of_cores = mp.cpu_count()//3
-    #num_of_cores = 4
+    num_of_cores = 1#mp.cpu_count()//3
     print('Start execution with ' + str(num_of_cores) + ' cores.')
     pool = mp.Pool(num_of_cores)
     for ad in range(100000):
