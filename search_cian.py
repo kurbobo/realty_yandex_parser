@@ -11,16 +11,7 @@ import random
 import os
 
 
-number_of_pages = 200
 open('cian.txt','w').close()
-# chrome_options = webdriver.ChromeOptions()
-# chrome_options.add_argument("no-sandbox")
-# chrome_options.add_argument("--disable-extensions")
-# chrome_options.add_argument("--disable-dev-shm-usage")
-# chrome_options.add_argument("--headless")
-# driver = os.path.join("/usr/local/bin","chromedriver")
-# prefs = {'disk-cache-size': 4096}
-# chrome_options.add_experimental_option("prefs", prefs)
 
 tbb_dir = "/home/alex/Alex/big_data/tor-browser_en-US"
 def pars_price_range(browser):
@@ -98,11 +89,13 @@ def pars_district_analytics(browser):
     except NoSuchElementException:
         price_per_m, price_per_m_dynamics, price_per_h, price_per_h_dynamics, rent_price, rent_dynamics = [None, None,None, None,None, None]
     return price_per_m, price_per_m_dynamics, price_per_h, price_per_h_dynamics, rent_price, rent_dynamics
-
+#for automatic getting of current initial_id
 import subprocess
-
 initial_id = int(subprocess.check_output(["./get_last_ad.sh"]))
 db_free = 1
+
+from datetime import datetime
+today_date = datetime.today().strftime('%Y-%m-%d')
 
 print(initial_id)
 def parser(flat_string):
@@ -138,18 +131,17 @@ def parser(flat_string):
                     'visitors' : visitors_parser(flat_string),
                     'date_of_place': date_of_place_parser(flat_string),
                     'total_number_views': total_number_views_parser(flat_string),
-                    'active': active_parser(flat_string)}
+                    'active': active_parser(flat_string), 
+                    }
     return element_dict
     
 def crawler(page_id, page_num):
     print('start crawler')
-    time.sleep(4*random.random())
+    time.sleep(1*random.random())
     stop_trying = 0
     start_time = time.process_time()
     while(stop_trying < 3):
         data = download_data(page_id)
-        print('data = ', str(data)," ", str(page_id))
-        #'connection refused' in str(download_data(page_id))
         if data==0:
             break
         else:
@@ -224,6 +216,7 @@ def download_data(page_id):
             info_dict['rent_price_in_dst'] = rent_price_in_dst
             info_dict['rent_dynamics_in_dst'] = rent_dynamics_in_dst
             info_dict['cian_id'] = page_id
+            info_dict['date_of_adding_to_db'] =  today_date
             info_dict.update( {'pic_urls' : list(map(lambda x: x.get_attribute("src"), browser.find_elements_by_css_selector('img.fotorama__img')))})
             # соединяемся с сервером базы данных
             # (по умолчанию подключение осуществляется на localhost:27017)
@@ -263,7 +256,7 @@ if __name__=="__main__":
     num_of_cores = mp.cpu_count()-2
     print('Start execution with ' + str(num_of_cores) + ' cores.')
     pool = mp.Pool(num_of_cores)
-    for ad in range(100000):
+    for ad in range(1000):#100000
         pool.apply_async(crawler, args=(initial_id + ad, ad))
     pool.close()
     pool.join()
