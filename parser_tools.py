@@ -297,6 +297,8 @@ def building_for_coordinates(building):
 
 
 def latitude(address):
+	if address is None:
+		return None
 	place = str(address[0]) + ',' + str(address[-2]) + ',' + building_for_coordinates(str(address[-1]))
 	nom = Nominatim()
 	n = nom.geocode(place)
@@ -313,6 +315,8 @@ def latitude(address):
 
 
 def longitude(address):
+	if address is None:
+		return None
 	place = str(address[0]) + ',' + str(address[-2]) + ',' + building_for_coordinates(str(address[-1]))
 	nom = Nominatim()
 	n = nom.geocode(place)
@@ -367,3 +371,10 @@ def total_number_views_parser(flat_string):
 	return total_number_views
 def removeNonAscii(s):
     return "".join(i for i in s if ord(i)<128)
+def active_parser(flat_string):
+	reg_active = re.search(r'Объявление снято с публикации', flat_string)
+	if bool(reg_active)==True:
+		central_heating = False
+	else:
+		central_heating = True
+	return central_heating
