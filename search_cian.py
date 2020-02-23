@@ -6,6 +6,7 @@ from tbselenium.tbdriver import TorBrowserDriver
 from tbselenium.utils import start_xvfb, stop_xvfb
 import pymongo
 import time
+import traceback
 import random
 import os
 
@@ -21,7 +22,7 @@ open('cian.txt','w').close()
 # prefs = {'disk-cache-size': 4096}
 # chrome_options.add_experimental_option("prefs", prefs)
 
-tbb_dir = "../tor-browser_en-US"
+tbb_dir = "/home/alex/Alex/big_data/tor-browser_en-US"
 def pars_price_range(browser):
     try:
         price_range = browser.find_element_by_css_selector('a.a10a3f92e9--price_range-link--3Kdo-').text
@@ -99,7 +100,7 @@ def pars_district_analytics(browser):
     return price_per_m, price_per_m_dynamics, price_per_h, price_per_h_dynamics, rent_price, rent_dynamics
 
 db_free = 1
-initial_id = 220833621
+initial_id = 220834530
 
 def parser(flat_string):
     element_dict = {'id': id_num_parser(flat_string),
@@ -142,19 +143,19 @@ def crawler(page_id, page_num):
     time.sleep(4*random.random())
     stop_trying = 0
     start_time = time.process_time()
-    while(stop_trying < 10):
-        try:
-            data = download_data(page_id)
-            #'connection refused' in str(download_data(page_id))
-            if data==0:
-                break
-        except Exception:
-            print('error occured on ' + str(stop_trying) + ' attempt in ' + str(page_id))
-            stop_trying += 1
+    while(stop_trying < 3):
+        data = download_data(page_id)
+        print('data = ', str(data)," ", str(page_id))
+        #'connection refused' in str(download_data(page_id))
+        if data==0:
+            break
         else:
-            if 'connection refused' not in str(data) or (time.process_time() - start_time>5*60):
-                print('took time more than 5 mins or connection refused')
-                break
+            print('error occured on ' + str(stop_trying + 1) + ' attempt in ' + str(page_id))
+            traceback.print_exc()
+            stop_trying += 1
+        if (time.process_time() - start_time>3*60):
+            print('took time more than 5 mins')
+            break
     print('time is ', str(time.process_time() - start_time))
     print('Ad with number: ' + str(page_num) + ' finished parsing.')
     
@@ -166,7 +167,7 @@ def crawler(page_id, page_num):
 def download_data(page_id):
     print('start download_data')
     try:
-        with open( 'ads_texts/'+ str(page_id) + '.txt', 'a', encoding='utf-8') as output_file:
+        with open('/home/alex/Alex/big_data/realty_parser/ads_texts/'+ str(page_id) + '.txt', 'a', encoding='utf-8') as output_file:
             xvfb_display = start_xvfb()
             # browser = webdriver.Chrome(options=chrome_options)
             browser = TorBrowserDriver(tbb_dir)
@@ -239,10 +240,11 @@ def download_data(page_id):
             browser.quit()
             stop_xvfb(xvfb_display)
             return 0
-    except TypeError:
-        time.sleep(4*random.random())
-        browser.quit()
-        stop_xvfb(xvfb_display)
+    # except TypeError as exception:
+    #     time.sleep(4*random.random())
+    #     browser.quit()
+    #     stop_xvfb(xvfb_display)
+    #     return 1
     except Exception as exception:
         print("Error has occured in: " + str(page_id))
         print(exception)
@@ -250,12 +252,12 @@ def download_data(page_id):
         f.write(str(page_id) + "\n")
         browser.quit()
         stop_xvfb(xvfb_display)
-        return exception
+        return 1
 
 
 if __name__=="__main__":
     import multiprocessing as mp
-    num_of_cores = 1#mp.cpu_count()//3
+    num_of_cores = mp.cpu_count()-2
     print('Start execution with ' + str(num_of_cores) + ' cores.')
     pool = mp.Pool(num_of_cores)
     for ad in range(100000):
