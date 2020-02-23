@@ -99,9 +99,12 @@ def pars_district_analytics(browser):
         price_per_m, price_per_m_dynamics, price_per_h, price_per_h_dynamics, rent_price, rent_dynamics = [None, None,None, None,None, None]
     return price_per_m, price_per_m_dynamics, price_per_h, price_per_h_dynamics, rent_price, rent_dynamics
 
-db_free = 1
-initial_id = 220834530
+import subprocess
 
+initial_id = int(subprocess.check_output(["./get_last_ad.sh"]))
+db_free = 1
+
+print(initial_id)
 def parser(flat_string):
     element_dict = {'id': id_num_parser(flat_string),
                     'Number_of_rooms': number_of_rooms_parser(flat_string),
