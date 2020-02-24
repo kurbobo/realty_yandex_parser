@@ -378,3 +378,72 @@ def active_parser(flat_string):
 	else:
 		central_heating = True
 	return central_heating
+
+#tor code
+tbb_dir = "/home/alex/Alex/big_data/tor-browser_en-US"
+from tbselenium.tbdriver import TorBrowserDriver
+from tbselenium.utils import start_xvfb, stop_xvfb
+from search_cian import pars_house_analytics
+
+
+#this is data_scheduler part
+
+def parser_updater(flat_string):
+    element_dict = {'total_price': total_price_parser(flat_string),
+                    'price_per_sq_meter': price_per_sq_meter_parser(flat_string),
+                    'visitors' : visitors_parser(flat_string),
+                    'total_number_views': total_number_views_parser(flat_string),
+                    'active': active_parser(flat_string), 
+                    }
+    return element_dict
+    
+def update_data(page_id):
+    print('start update data')
+    # try:
+    with open('/home/alex/Alex/big_data/realty_parser/ads_texts/'+ str(page_id) + '.txt', 'a', encoding='utf-8') as output_file:
+        xvfb_display = start_xvfb()
+        browser = TorBrowserDriver(tbb_dir)
+        # Get the URL of next page to be parsed
+        browser.get("https://spb.cian.ru/sale/flat/" + str(page_id) + "/")
+
+        element_list = list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--header--2Ayiz')))
+        element_list += ["address:\n"]
+        element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('address.a10a3f92e9--address--140Ec')))
+        element_list += ["\n"]
+        element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--description--10czU')))
+        element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--price-container--29gwP')))
+        element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--section_divider--1zGrv')))
+        element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--offer_card_page-main--1glTM a10a3f92e9--aside_banner--2FWCV')))
+        element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--offer_card_page-bti--2BrZ7')))
+        element_list += ["\n"]
+        element_list += ["ID_num: " + str(page_id)]
+        element_list += ["\n"]
+        element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--container--1In69')))
+        element_list += ["\n"]
+
+        try:
+            browser.find_element_by_css_selector('a.a10a3f92e9--link--1t8n1.a10a3f92e9--link--2mJJk').click()
+            element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--information--AyP9e')))
+            element_list += ["\n"]
+            for elementName in browser.find_elements_by_css_selector("path.highcharts-point"):
+                hover = ActionChains(browser).move_to_element(elementName).click().perform()
+                element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector("g.highcharts-label.highcharts-tooltip.highcharts-color-undefined")))
+                element_list += ["\n"]
+        except:
+            print("No info about visitors in ad: " + str(page_id))
+        element_str = "".join(element_list)
+        for text in element_list:
+            output_file.write(text + '\n')
+        output_file.write('-------------------------------------------------------------------------\n')
+        info_dict = parser_updater(element_str)
+        browser.quit()
+        stop_xvfb(xvfb_display)
+        return info_dict
+    # except Exception as exception:
+    #     print("Error has occured in: " + str(page_id))
+    #     print(exception)
+    #     f= open("errors.txt","a+")
+    #     f.write(str(page_id) + "\n")
+    #     browser.quit()
+    #     stop_xvfb(xvfb_display)
+    #     return None

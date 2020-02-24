@@ -189,12 +189,10 @@ def download_data(page_id):
             price_range = pars_price_range(browser)
             try:
                 browser.find_element_by_css_selector('a.a10a3f92e9--link--1t8n1.a10a3f92e9--link--2mJJk').click()
-                time.sleep(0.5)
                 element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--information--AyP9e')))
                 element_list += ["\n"]
                 for elementName in browser.find_elements_by_css_selector("path.highcharts-point"):
                     hover = ActionChains(browser).move_to_element(elementName).click().perform()
-                    time.sleep(0.1)
                     element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector("g.highcharts-label.highcharts-tooltip.highcharts-color-undefined")))
                     element_list += ["\n"]
             except:
@@ -236,11 +234,7 @@ def download_data(page_id):
             browser.quit()
             stop_xvfb(xvfb_display)
             return 0
-    # except TypeError as exception:
-    #     time.sleep(4*random.random())
-    #     browser.quit()
-    #     stop_xvfb(xvfb_display)
-    #     return 1
+
     except Exception as exception:
         print("Error has occured in: " + str(page_id))
         print(exception)
@@ -256,11 +250,13 @@ if __name__=="__main__":
     num_of_cores = mp.cpu_count()-2
     print('Start execution with ' + str(num_of_cores) + ' cores.')
     pool = mp.Pool(num_of_cores)
-    for ad in range(1000):#100000
+    N = 500
+    for ad in range(N):#100000
+        if ad>=N-10:
+            break
         pool.apply_async(crawler, args=(initial_id + ad, ad))
     pool.close()
     pool.join()
 
-
-print('Parsing is done!!!')
+    print('Parsing is done!!!')
 
