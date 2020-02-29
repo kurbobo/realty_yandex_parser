@@ -10,7 +10,6 @@ import traceback
 import random
 import os
 
-
 open('cian.txt','w').close()
 
 tbb_dir = "/home/alex/Alex/big_data/tor-browser_en-US"
@@ -144,9 +143,12 @@ def crawler(page_id, page_num):
         data = download_data(page_id)
         if data==0:
             break
-        else:
+        elif data==1:
             print('error occured on ' + str(stop_trying + 1) + ' attempt in ' + str(page_id))
-            traceback.print_exc()
+            # traceback.print_exc()
+            stop_trying += 1
+        else: 
+            print('capcha')
             stop_trying += 1
         if (time.process_time() - start_time>3*60):
             print('took time more than 5 mins')
@@ -168,7 +170,6 @@ def download_data(page_id):
             browser = TorBrowserDriver(tbb_dir)
             # Get the URL of next page to be parsed
             browser.get("https://spb.cian.ru/sale/flat/" + str(page_id) + "/")
-
             element_list = list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--header--2Ayiz')))
             element_list += ["address:\n"]
             element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('address.a10a3f92e9--address--140Ec')))
@@ -202,6 +203,10 @@ def download_data(page_id):
                 output_file.write(text + '\n')
             output_file.write('-------------------------------------------------------------------------\n')
             info_dict = parser(element_str)
+            if info_dict['total_price'] is None and info_dict['address'] is None:
+                browser.quit()
+                stop_xvfb(xvfb_display)
+                return 2
             info_dict['price_range'] = price_range
             info_dict['purchase_price'] = purchase_price
             info_dict['purchase_dynamics'] = purchase_dynamics
