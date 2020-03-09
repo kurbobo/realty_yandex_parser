@@ -139,7 +139,7 @@ def crawler(page_id, page_num):
     time.sleep(1*random.random())
     stop_trying = 0
     start_time = time.process_time()
-    while(stop_trying < 3):
+    while(stop_trying < 12):
         data = download_data(page_id)
         if data==0:
             break
@@ -149,6 +149,7 @@ def crawler(page_id, page_num):
             stop_trying += 1
         else: 
             print('capcha')
+            print('error occured on ' + str(stop_trying + 1) + ' attempt in ' + str(page_id))
             stop_trying += 1
         if (time.process_time() - start_time>3*60):
             print('took time more than 5 mins')
