@@ -2,7 +2,7 @@ import pymongo
 from datetime import datetime, timedelta
 from parser_tools import update_data
 def add_if_different(old_dict, updated_dict, date, collection,  string):
-	if not (ld_dict[string] == updated_dict[string]):
+	if not (old_dict[string] == updated_dict[string]):
 		if type(old_dict[string]) is dict:
 			lst_value = old_dict[string]
 			lst_value.append(updated_dict[string])
@@ -16,32 +16,36 @@ def add_if_different(old_dict, updated_dict, date, collection,  string):
 		collection.update_one(myquery, newvalues)
 		newtimes = { "$set": { 'date_of_adding_to_db': lst_date } }
 		collection.update_one(myquery, newtimes)
+		print('updated '+ str(old_dict['id']))
+		print('newtimes are', newtimes)
 
 
 myclient = pymongo.MongoClient('localhost', 27017, maxPoolSize=200)
 db = myclient.flats
 # выбираем коллекцию документов
 mycol = db.coll
-past = (datetime.now() - timedelta(days=10)).strftime('%Y-%m-%d')
-
+past = (datetime.now() - timedelta(days=11)).strftime('%Y-%m-%d')
+print('past = ', past)
 for old_dict in mycol.find({ 'date_of_adding_to_db': {"$lt": past}}):
-# for x in mycol.find({ 'visitors': {"$ne": None}}):
-  visitors_dict = old_dict['visitors']
-  purchase_price =  old_dict['total_price']
-  elem_id = old_dict['id']
-  price_per_sq_meter = old_dict['price_per_sq_meter']
-  total_number_views = old_dict['total_number_views']
-  date = old_dict['date_of_adding_to_db'] 
-  active = old_dict['active']
-  updated_dict = update_data(elem_id)
-  if updated_dict is None:
-  	continue
-  else:
-	  add_if_different(old_dict, updated_dict, date, mycol,  'visitors')
-	  add_if_different(old_dict, updated_dict, date, mycol,  'total_price')
-	  add_if_different(old_dict, updated_dict, date, mycol,  'price_per_sq_meter')
-	  add_if_different(old_dict, updated_dict, date, mycol,  'total_number_views')
-	  add_if_different(old_dict, updated_dict, date, mycol,  'active')
+	if type(old_dict['date_of_adding_to_db']) is list and max(old_dict['date_of_adding_to_db'])<past:
+		visitors_dict = old_dict['visitors']
+		purchase_price =  old_dict['total_price']
+		elem_id = old_dict['id']
+		price_per_sq_meter = old_dict['price_per_sq_meter']
+		total_number_views = old_dict['total_number_views']
+		date = old_dict['date_of_adding_to_db'] 
+		active = old_dict['active']
+		updated_dict = update_data(elem_id)
+		if updated_dict is None:
+			continue
+		else:
+			
+		  add_if_different(old_dict, updated_dict, date, mycol,  'visitors')
+		  add_if_different(old_dict, updated_dict, date, mycol,  'total_price')
+		  add_if_different(old_dict, updated_dict, date, mycol,  'price_per_sq_meter')
+		  add_if_different(old_dict, updated_dict, date, mycol,  'total_number_views')
+		  add_if_different(old_dict, updated_dict, date, mycol,  'active')
+myclient.close()
 
 
 #   x.update_one({
