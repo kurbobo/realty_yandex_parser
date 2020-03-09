@@ -10,7 +10,7 @@ mycol = db.coll
 past = (datetime.now() - timedelta(days=10)).strftime('%Y-%m-%d')
 print('past = ', past)
 i = 0
-for old_dict in mycol.find({ 'date_of_adding_to_db': {"$lt": past}, 'seen_as_old': { "$exists": False } }):
+for old_dict in mycol.find({ 'date_of_adding_to_db': {"$lt": past}, 'seen_as_old': { "$exists": False } , 'visitors': {"$ne": None}}):
 	# try:
 		print('hey', old_dict['id'])
 		crawler(old_dict['id'], i)
