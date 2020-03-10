@@ -137,7 +137,7 @@ def seiling_hight_parser(flat_string):
         return ceiling_height
     except:
         return None
-print(seiling_hight_parser('Высота потолков\n2'))
+# print(seiling_hight_parser('Высота потолков\n2'))
 
 def bathroom_num_parser(flat_string):
 	reg_for_bathroom_num = re.search(r'Санузел\s+\d+\s+\w+', flat_string)
