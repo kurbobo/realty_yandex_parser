@@ -96,7 +96,7 @@ db_free = 1
 from datetime import datetime
 today_date = datetime.today().strftime('%Y-%m-%d')
 
-print(initial_id)
+# print(initial_id)
 def parser(flat_string):
     element_dict = {'id': id_num_parser(flat_string),
                     'Number_of_rooms': number_of_rooms_parser(flat_string),
@@ -134,7 +134,7 @@ def parser(flat_string):
                     }
     return element_dict
     
-def crawler(page_id, page_num):
+def crawler(page_id, page_num=None):
     print('start crawler')
     time.sleep(1*random.random())
     stop_trying = 0
@@ -155,7 +155,8 @@ def crawler(page_id, page_num):
             print('took time more than 5 mins')
             break
     print('time is ', str(time.process_time() - start_time))
-    print('Ad with number: ' + str(page_num) + ' finished parsing.')
+    if not page_num is None:
+        print('Ad with number: ' + str(page_num) + ' finished parsing.')
     
     ''' increment the global counter, do something with the input '''
 
