@@ -134,12 +134,12 @@ def parser(flat_string):
                     }
     return element_dict
     
-def crawler(page_id, page_num=None):
+def crawler(page_id, page_num=None, stop_trying_treshhold=12):
     print('start crawler')
     time.sleep(1*random.random())
     stop_trying = 0
     start_time = time.process_time()
-    while(stop_trying < 12):
+    while(stop_trying < stop_trying_treshhold):
         data = download_data(page_id)
         if data==0:
             break
