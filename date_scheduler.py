@@ -20,7 +20,7 @@ import multiprocessing as mp
 num_of_cores = mp.cpu_count()-2
 print('Start execution with ' + str(num_of_cores) + ' cores.')
 pool = mp.Pool(num_of_cores)
-for old_dict in mycol.find({ 'date_of_adding_to_db': {"$lt": past}, 'seen_as_old': { "$exists": False } , 'visitors': {"$ne": None}}):
+for old_dict in mycol.find({ 'date_of_adding_to_db': {"$lt": past}, 'seen_as_old': { "$exists": False } , 'visitors': {"$ne": None}, 'active': True}):
 	try:
 		pool.apply_async(updating_crawler, args=(old_dict['id'], old_dict['_id']))
 		# updating_crawler(old_dict['id'], old_dict['_id'])
