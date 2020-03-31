@@ -22,7 +22,7 @@ chrome_options.add_experimental_option("prefs", prefs)
 
 db_free = 1
 #initial_id = 221361553
-initial_id = 221331782
+initial_id = 225911716
 def pars_price_range(browser):
     try:
         price_range = browser.find_element_by_css_selector('a.a10a3f92e9--price_range-link--3Kdo-').text
@@ -100,7 +100,7 @@ def pars_district_analytics(browser):
     return price_per_m, price_per_m_dynamics, price_per_h, price_per_h_dynamics, rent_price, rent_dynamics
 
 db_free = 1
-initial_id = 220833621
+#initial_id = 220833621
 
 def parser(flat_string):
     element_dict = {'id': id_num_parser(flat_string),
@@ -173,6 +173,7 @@ def download_data(page_id):
             element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('address.a10a3f92e9--address--140Ec')))
             element_list += ["\n"]
             element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--description--10czU')))
+            element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--info-block--3cWJy')))
             element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--price-container--29gwP')))
             element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--section_divider--1zGrv')))
             element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--offer_card_page-main--1glTM a10a3f92e9--aside_banner--2FWCV')))
@@ -247,9 +248,9 @@ def download_data(page_id):
 
 if __name__=="__main__":
     import multiprocessing as mp
-    num_of_cores = mp.cpu_count()
+    num_of_cores = 1#mp.cpu_count()
     print('Start execution with ' + str(num_of_cores) + ' cores.')
-    pool = mp.Pool()
+    pool = mp.Pool(1)
     for ad in range(100000):
         pool.apply_async(crawler, args=(initial_id + ad, ad))
     pool.close()
