@@ -28,14 +28,17 @@ def address_parser(flat_string):
 
 def number_of_rooms_parser(flat_string):
 	reg_for_number_of_rooms = re.search(r'\d+-комн.\s+квартира,\s+\d+,?\d*', flat_string)
-	if bool(reg_for_number_of_rooms)==False:
+	studio = re.search(r'Студия,\s+\d+,?\d*', flat_string)#????
+	if bool(reg_for_number_of_rooms)==False and bool(studio)==False:
 		number_of_rooms = None
 	else:
-		reg_for_number_of_rooms = reg_for_number_of_rooms.group(0)
-		number_of_rooms, total_square = re.findall('\s*\d+,?\d*', reg_for_number_of_rooms)
-		number_of_rooms = int(number_of_rooms)
+		if bool(reg_for_number_of_rooms):
+			reg_for_number_of_rooms = reg_for_number_of_rooms.group(0)
+			number_of_rooms, total_square = re.findall('\s*\d+,?\d*', reg_for_number_of_rooms)
+			number_of_rooms = int(number_of_rooms)
+		else:
+			number_of_rooms = '0.8'
 	return number_of_rooms
-
 
 def total_square_parser(flat_string):
 	reg_for_total_square = re.search(r'\d+-комн.\s+квартира,\s+\d+,?\d*', flat_string)
