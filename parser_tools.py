@@ -28,7 +28,7 @@ def address_parser(flat_string):
 
 def number_of_rooms_parser(flat_string):
 	reg_for_number_of_rooms = re.search(r'\d+-комн.\s+квартира,\s+\d+,?\d*', flat_string)
-	studio = re.search(r'Студия,\s+\d+,?\d*', flat_string)#????
+	studio = re.search(r'Студия', flat_string)#????
 	if bool(reg_for_number_of_rooms)==False and bool(studio)==False:
 		number_of_rooms = None
 	else:
@@ -42,13 +42,23 @@ def number_of_rooms_parser(flat_string):
 
 def total_square_parser(flat_string):
 	reg_for_total_square = re.search(r'\d+-комн.\s+квартира,\s+\d+,?\d*', flat_string)
-	if bool(reg_for_total_square)==False:
+	studio = re.search(r'Студия,\s+\d+,?\d*', flat_string)
+	if bool(reg_for_total_square)==False and bool(studio)==False:
 		total_square = None
 	else:
-		reg_for_total_square = reg_for_total_square.group(0)
-		amount_of_rooms, total_square = re.findall('\s*\d+,?\d*', reg_for_total_square)
-		total_square = float(total_square.replace(',', '.'))
+		if bool(reg_for_total_square):
+			reg_for_total_square = reg_for_total_square.group(0)
+			amount_of_rooms, total_square = re.findall('\s*\d+,?\d*', reg_for_total_square)
+			total_square = float(total_square.replace(',', '.'))
+		else:
+			studio = studio.group(0)
+			total_square = re.findall('\s*\d+,?\d*', studio)[0]
+			total_square = float(total_square.replace(',', '.'))
 	return total_square
+# print(total_square_parser('1-комн. квартира, 41 м²'))
+# print(total_square_parser('Студия, 15,4 м²'))
+# print(number_of_rooms_parser('1-комн. квартира, 41 м²'))
+# print(number_of_rooms_parser('Студия, 15,4 м²'))
 
 
 def living_area_parser(flat_string):
