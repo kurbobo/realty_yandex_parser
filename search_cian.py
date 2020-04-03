@@ -10,8 +10,6 @@ import traceback
 import random
 import os
 
-open('cian.txt','w').close()
-
 tbb_dir = "/home/alex/Alex/big_data/tor-browser_en-US"
 def pars_price_range(browser):
     try:
