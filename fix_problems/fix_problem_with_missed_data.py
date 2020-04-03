@@ -12,7 +12,8 @@ connect = pymongo.MongoClient('localhost', 27017, maxPoolSize=200)
 db = connect.flats
 # выбираем коллекцию документов
 # db.coll
-for ad in ads_list:
+import tqdm
+for ad in tqdm.tqdm(ads_list):
 	with open(ad, 'r') as ad:
 				x = ''.join(ad.readlines())
 				string =  pt.number_of_rooms_parser(x)
