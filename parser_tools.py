@@ -28,7 +28,7 @@ def address_parser(flat_string):
 
 def number_of_rooms_parser(flat_string):
 	reg_for_number_of_rooms = re.search(r'\d+-комн.\s+квартира,\s+\d+,?\d*', flat_string)
-	studio = re.search(r'Студия', flat_string)#????
+	studio = re.search(r'Студия,\s+\d+,?\d*', flat_string)#????
 	if bool(reg_for_number_of_rooms)==False and bool(studio)==False:
 		number_of_rooms = None
 	else:
