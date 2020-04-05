@@ -129,6 +129,7 @@ def parser(flat_string):
                     'date_of_place': date_of_place_parser(flat_string),
                     'total_number_views': total_number_views_parser(flat_string),
                     'active': active_parser(flat_string), 
+                    'trade_type': rent_or_sale_parser(flat_string)
                     }
     return element_dict
     
@@ -170,10 +171,14 @@ def download_data(page_id):
             browser = TorBrowserDriver(tbb_dir)
             # Get the URL of next page to be parsed
             browser.get("https://spb.cian.ru/sale/flat/" + str(page_id) + "/")
+            #колонка с количеством комнат, метражом, адресом
             element_list = list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--header--2Ayiz')))
             element_list += ["address:\n"]
+            #колонка конкретно с адресом
             element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('address.a10a3f92e9--address--140Ec')))
             element_list += ["\n"]
+            # колонка с путем до объявления а также с датой обновления и ссылкой на статистику объявлений 
+            element_list += list(map(lambda x: x.text+'\n', browser.find_elements_by_css_selector('div.a10a3f92e9--offer_card_page-top--o2SYS')))
             element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--description--10czU')))
             element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--info-block--3cWJy')))
             element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--price-container--29gwP')))
@@ -204,6 +209,7 @@ def download_data(page_id):
                 output_file.write(text + '\n')
             output_file.write('-------------------------------------------------------------------------\n')
             info_dict = parser(element_str)
+            # print(info_dict)
             if info_dict['total_price'] is None and info_dict['address'] is None:
                 browser.quit()
                 stop_xvfb(xvfb_display)
