@@ -130,7 +130,7 @@ def total_price_parser(flat_string):
 			fin = reg_for_total_price_rent.group(0).replace(' ','').replace('\n','').split('₽')
 			total_price = int(fin[0])
 	return total_price
-print(total_price_parser('40 000 ₽/мес.'))
+# print(total_price_parser('40 000 ₽/мес.'))
 
 def price_per_sq_meter_parser(flat_string):
 	reg_for_price_per_sq_meter = re.search(r'\d+\s*\d*\s*\d*\s*₽\s*'*2, flat_string)
@@ -403,7 +403,9 @@ def rent_or_sale_parser(flat_string):
 		for i in reg.group(0).split():
 			if 'Продажа' in i:
 				return 'sale'
-			if 'Аренда' in i:
-				return 'rent'
+			if 'АрендаАренда' in i:
+				return 'rent_long'
+			elif 'ПосуточноАренда' in i:
+				return 'rent_short'
 		return None
 # print(rent_or_sale_parser('Недвижимость в Санкт-ПетербургеАрендаАренда 2-комнатных квартир \n'))
