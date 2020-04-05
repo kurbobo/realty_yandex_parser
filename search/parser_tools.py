@@ -236,21 +236,35 @@ def central_heating_parser(flat_string):
 
 
 def elevator_service_parser(flat_string):
-	reg_for_elevator_service = re.search(r'\d+\s*пассажирских', flat_string)
-	if bool(reg_for_elevator_service)==False:
-		elevator_service = None
+	reg_for_elevator_service = re.search(r'\d+\s*грузов', flat_string)
+
+	if not bool(reg_for_elevator_service):
+		reg_for_elevator_absence = re.search(r'Лифты', flat_string)
+		if not bool(reg_for_elevator_absence):
+			elevator_service = None
+		else:
+			elevator_service = "No"
 	else:
 		elevator_service = int(reg_for_elevator_service.group(0).split()[0])
 	return elevator_service
 
 
 def elevator_passangers_parser(flat_string):
-	reg_for_elevator_passangers = re.search(r'\d+\s*пассажирских', flat_string)
-	if bool(reg_for_elevator_passangers)==False:
-		elevator_passangers = None
+	reg_for_elevator_passangers = re.search(r'\d+\s*пассажирск', flat_string)
+	if not bool(reg_for_elevator_passangers):
+		reg_for_elevator_absence = re.search(r'Лифты', flat_string)
+		if not bool(reg_for_elevator_absence):
+			elevator_passangers = None
+		else:
+			elevator_passangers = "No"	
 	else:
 		elevator_passangers = int(reg_for_elevator_passangers.group(0).split()[0])
 	return elevator_passangers
+# with open('ex.txt', 'r') as f:
+# 	flat = "".join(f.readlines())
+# # print(flat)
+# print(elevator_service_parser(flat))
+# print(elevator_passangers_parser(flat))
 
 
 def emergency_condition_parser(flat_string):
