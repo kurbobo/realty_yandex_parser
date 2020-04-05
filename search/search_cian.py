@@ -88,7 +88,7 @@ def pars_district_analytics(browser):
     return price_per_m, price_per_m_dynamics, price_per_h, price_per_h_dynamics, rent_price, rent_dynamics
 #for automatic getting of current initial_id
 import subprocess
-initial_id = int(subprocess.check_output(["./get_last_ad.sh"]))
+initial_id = 228185753 #int(subprocess.check_output(["./get_last_ad.sh"]))
 db_free = 1
 
 from datetime import datetime
@@ -179,15 +179,22 @@ def download_data(page_id):
             element_list += ["\n"]
             # колонка с путем до объявления а также с датой обновления и ссылкой на статистику объявлений 
             element_list += list(map(lambda x: x.text+'\n', browser.find_elements_by_css_selector('div.a10a3f92e9--offer_card_page-top--o2SYS')))
+            #хз что это
             element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--description--10czU')))
+            #информация по площади и этаэности
             element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--info-block--3cWJy')))
+            #цена квартиры
             element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--price-container--29gwP')))
+            #общая информация
             element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--section_divider--1zGrv')))
+            #
             element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--offer_card_page-main--1glTM a10a3f92e9--aside_banner--2FWCV')))
+            ## о доме (год постройки, тип дома и тд)
             element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--offer_card_page-bti--2BrZ7')))
             element_list += ["\n"]
             element_list += ["ID_num: " + str(page_id)]
             element_list += ["\n"]
+            #хз
             element_list += list(map(lambda x: x.text, browser.find_elements_by_css_selector('div.a10a3f92e9--container--1In69')))
             element_list += ["\n"]
             purchase_price, purchase_dynamics, rent_price, rent_dynamics = pars_house_analytics(browser)
