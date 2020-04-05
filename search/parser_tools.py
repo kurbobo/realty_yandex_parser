@@ -118,14 +118,19 @@ def building_year_parser(flat_string):
 
 
 def total_price_parser(flat_string):
-	reg_for_total_price = re.search(r'\d+\s*\d*\s*\d*\s*₽\s*'*2, flat_string)
-	if bool(reg_for_total_price)==False:
+	reg_for_total_price_sale = re.search(r'\d+\s*\d*\s*\d*\s*₽\s*'*2, flat_string)
+	reg_for_total_price_rent = re.search(r'\d+\s*\d*\s*\d*\s*₽/.', flat_string)
+	if not bool(reg_for_total_price_sale) and not bool(reg_for_total_price_rent):
 		total_price = None
 	else:
-		fin = reg_for_total_price.group(0).replace(' ','').replace('\n','').split('₽')
-		total_price = int(fin[0])
+		if bool(reg_for_total_price_sale):
+			fin = reg_for_total_price_sale.group(0).replace(' ','').replace('\n','').split('₽')
+			total_price = int(fin[0])
+		else:
+			fin = reg_for_total_price_rent.group(0).replace(' ','').replace('\n','').split('₽')
+			total_price = int(fin[0])
 	return total_price
-
+print(total_price_parser('40 000 ₽/мес.'))
 
 def price_per_sq_meter_parser(flat_string):
 	reg_for_price_per_sq_meter = re.search(r'\d+\s*\d*\s*\d*\s*₽\s*'*2, flat_string)
@@ -401,4 +406,4 @@ def rent_or_sale_parser(flat_string):
 			if 'Аренда' in i:
 				return 'rent'
 		return None
-# print(rent_or_sale_parser('Недвижимость в ЯкутскеПродажаПродажа 1-комнатных квартир в Якутске203-й мкр\n'))
+# print(rent_or_sale_parser('Недвижимость в Санкт-ПетербургеАрендаАренда 2-комнатных квартир \n'))
