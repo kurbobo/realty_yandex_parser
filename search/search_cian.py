@@ -88,7 +88,7 @@ def pars_district_analytics(browser):
     return price_per_m, price_per_m_dynamics, price_per_h, price_per_h_dynamics, rent_price, rent_dynamics
 #for automatic getting of current initial_id
 import subprocess
-initial_id = 228185753 #int(subprocess.check_output(["./get_last_ad.sh"]))
+initial_id = int(subprocess.check_output(["./get_last_ad.sh"]))
 db_free = 1
 
 from datetime import datetime
