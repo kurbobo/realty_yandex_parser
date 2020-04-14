@@ -18,7 +18,7 @@ if __name__=="__main__":
 	db = myclient.flats
 	# выбираем коллекцию документов
 	mycol = db.coll
-	past = (datetime.now() - timedelta(days=10)).strftime('%Y-%m-%d')
+	past = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
 	print('past = ', past)
 	import multiprocessing as mp
 	num_of_cores = mp.cpu_count()-2
