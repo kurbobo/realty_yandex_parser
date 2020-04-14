@@ -70,7 +70,6 @@ def living_area_parser(flat_string):
 		living_area = float(living_area.replace(',', '.'))
 	return living_area
 
-
 def kitchen_area_parser(flat_string):
 	reg_for_liv_ar = re.search(r'\d+,?\d*\s+\w+\sКухня', flat_string)
 	if bool(reg_for_liv_ar)==False:
@@ -79,7 +78,11 @@ def kitchen_area_parser(flat_string):
 		kitchen_area = reg_for_liv_ar.group(0).split()[0]
 		kitchen_area = float(kitchen_area.replace(',', '.'))
 	return kitchen_area
-
+# with open('ex.txt', 'r') as f:
+# 	flat = "".join(f.readlines())
+# print(flat)
+# print(living_area_parser(flat))
+# print(kitchen_area_parser(flat))
 
 def type_of_flat_parser(flat_string):
 	reg_for_type = re.search(r'Тип жилья\s+\w+', flat_string)
@@ -111,12 +114,16 @@ def whole_storeys_parser(flat_string):
 def building_year_parser(flat_string):
 	reg_for_building_year = re.search(r'\d+\s*Построен', flat_string)
 	reg_for_building_year_in_common_info =re.search(r'Год постройки\s+\d+', flat_string)
-	if not bool(reg_for_building_year) and not bool(reg_for_building_year_in_common_info):
+	reg_for_house_delivery = re.search(r'\d+\s*кв.\s*\d+\s*Срок\s*сдачи', flat_string)#
+	if not bool(reg_for_building_year) and not bool(reg_for_building_year_in_common_info) and not bool(reg_for_house_delivery):
 		building_year = None
 	elif bool(reg_for_building_year):
 		building_year = int(reg_for_building_year.group(0).split()[0])
 	elif bool(reg_for_building_year_in_common_info):
 		building_year = int(reg_for_building_year_in_common_info.group(0).split()[-1])
+	elif bool(reg_for_house_delivery):
+		building_year = reg_for_house_delivery.group(0).split('\n')[0].split("кв.")
+		building_year = list(map(lambda x: int(x), building_year))
 	return building_year
 # with open('ex.txt', 'r') as f:
 # 	flat = "".join(f.readlines())
