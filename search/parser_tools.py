@@ -96,7 +96,7 @@ def type_of_flat_parser(flat_string):
 def storey_number_parser(flat_string):
 	reg_for_storey_number = re.search(r'\d+\s+из\s+\d+\s*Этаж', flat_string)
 	if bool(reg_for_storey_number)==False:
-		storey_number = None, None
+		storey_number = None
 	else:
 		storey_number = reg_for_storey_number.group(0).split()[0]
 	return storey_number
@@ -104,10 +104,13 @@ def storey_number_parser(flat_string):
 
 def whole_storeys_parser(flat_string):
 	reg_for_whole_storeys = re.search(r'\d+\s+из\s+\d+\s*Этаж', flat_string)
-	if bool(reg_for_whole_storeys)==False:
-		whole_storeys = None, None
-	else:
+	reg_for_whole_in_common = re.search(r'\d+\s+Этажей в доме', flat_string)#Этажей в доме
+	if not (bool(reg_for_whole_storeys) or bool(reg_for_whole_in_common)):
+		whole_storeys = None
+	elif bool(reg_for_whole_storeys):
 		whole_storeys = reg_for_whole_storeys.group(0).split()[2]
+	else:
+		whole_storeys = reg_for_whole_in_common.group(0).split()[0]
 	return whole_storeys
 
 
@@ -125,10 +128,11 @@ def building_year_parser(flat_string):
 		building_year = reg_for_house_delivery.group(0).split('\n')[0].split("кв.")
 		building_year = list(map(lambda x: int(x), building_year))
 	return building_year
-# with open('ex.txt', 'r') as f:
-# 	flat = "".join(f.readlines())
-# print(flat)
-# print(building_year_parser(flat))
+with open('ex.txt', 'r') as f:
+	flat = "".join(f.readlines())
+print(flat)
+# print(whole_storeys_parser(flat))
+# print(storey_number_parser(flat))
 
 def total_price_parser(flat_string):
 	reg_for_total_price_sale = re.search(r'\d+\s*\d*\s*\d*\s*₽\s*'*2, flat_string)
