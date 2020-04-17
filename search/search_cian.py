@@ -167,6 +167,7 @@ def download_data(page_id):
     try:
         with open('/home/alex/Alex/big_data/realty_parser/ads_texts/'+ str(page_id) + '.txt', 'a', encoding='utf-8') as output_file:
             xvfb_display = start_xvfb()
+            output_file.write(today_date + '\n')
             # browser = webdriver.Chrome(options=chrome_options)
             browser = TorBrowserDriver(tbb_dir)
             # Get the URL of next page to be parsed
@@ -212,6 +213,7 @@ def download_data(page_id):
             except:
                 print("No info about visitors in ad: " + str(page_id))
             element_str = "".join(element_list)
+            # print(element_str)
             for text in element_list:
                 output_file.write(text + '\n')
             output_file.write('-------------------------------------------------------------------------\n')
