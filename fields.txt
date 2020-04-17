@@ -47,3 +47,4 @@ visitors
 whole_storey_number
 windows_to_street
 сeiling_height
+trade_type
