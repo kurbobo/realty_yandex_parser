@@ -128,9 +128,9 @@ def building_year_parser(flat_string):
 		building_year = reg_for_house_delivery.group(0).split('\n')[0].split("кв.")
 		building_year = list(map(lambda x: int(x), building_year))
 	return building_year
-with open('ex.txt', 'r') as f:
-	flat = "".join(f.readlines())
-print(flat)
+# with open('ex.txt', 'r') as f:
+# 	flat = "".join(f.readlines())
+# print(flat)
 # print(whole_storeys_parser(flat))
 # print(storey_number_parser(flat))
 
@@ -441,3 +441,14 @@ def rent_or_sale_parser(flat_string):
 				return 'rent_short'
 		return None
 # print(rent_or_sale_parser('Недвижимость в Санкт-ПетербургеАрендаАренда 2-комнатных квартир \n'))
+def repair_type_parser(flat_string):
+	reg_for_repair_type = re.search(r'Ремонт\s+\w+', flat_string)
+	if bool(reg_for_repair_type)==False:
+		repair_type = None
+	else:
+		repair_type = reg_for_repair_type.group(0).split()[-1]
+	return repair_type
+with open('ex.txt', 'r') as f:
+	flat = "".join(f.readlines())
+# print(flat)
+# print(repair_type_parser(flat))
