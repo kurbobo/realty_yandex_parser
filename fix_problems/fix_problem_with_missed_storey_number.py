@@ -16,11 +16,10 @@ import tqdm
 for ad in tqdm.tqdm(ads_list):
 	with open(ad, 'r') as ad:
 				x = ''.join(ad.readlines())
-				string =  pt.number_of_rooms_parser(x)
-				if string=='0.8':
-					print(ad.name[:-4])
+				storey_number =  pt.storey_number_parser(x)
+				if storey_number is not None:
 					# print('updated')
-					myquery = { "id": int(ad.name[:-4])}
-					newvalues = { "$set": { "Number_of_rooms": "0.8" } }
+					myquery = { "id": int(ad.name[:-4]), "storey_number": [None, None]}
+					newvalues = { "$set": { "storey_number": storey_number } }
 					db.coll.update_many(myquery, newvalues)
 connect.close()
