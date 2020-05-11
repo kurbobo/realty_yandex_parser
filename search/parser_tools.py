@@ -448,7 +448,7 @@ def repair_type_parser(flat_string):
 	else:
 		repair_type = reg_for_repair_type.group(0).split()[-1]
 	return repair_type
-with open('ex.txt', 'r') as f:
-	flat = "".join(f.readlines())
+# with open('ex.txt', 'r') as f:
+# 	flat = "".join(f.readlines())
 # print(flat)
 # print(repair_type_parser(flat))
