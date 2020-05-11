@@ -129,7 +129,8 @@ def parser(flat_string):
                     'date_of_place': date_of_place_parser(flat_string),
                     'total_number_views': total_number_views_parser(flat_string),
                     'active': active_parser(flat_string), 
-                    'trade_type': rent_or_sale_parser(flat_string)
+                    'trade_type': rent_or_sale_parser(flat_string),
+                    'repair_type': repair_type_parser(flat_string)
                     }
     return element_dict
     
@@ -268,7 +269,7 @@ def download_data(page_id):
 
 if __name__=="__main__":
     import multiprocessing as mp
-    num_of_cores = mp.cpu_count()-2
+    num_of_cores = 4#mp.cpu_count()-3
     print('Start execution with ' + str(num_of_cores) + ' cores.')
     pool = mp.Pool(num_of_cores)
     N = 500
