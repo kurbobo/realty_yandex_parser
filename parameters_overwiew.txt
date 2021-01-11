@@ -1,0 +1,50 @@
+Building_year - год постройки
+Number_of_rooms - количество комнат
+_id - id  в базе данных
+active - активное ли объявление на момент его парсинга
+address - адресс
+bathroom_number - количество ванных
+bathroom_separated - раздельный ли санузел
+ceiling_type - тип крышы (железнобетонные/смешанные/..)
+central_heating - есть ли центральное отопление (yes/no)
+cian_id - id на циане
+date_of_adding_to_db - дата добавления в бд
+date_of_place - дата размещения объявления на циане
+emergency_condition - не помню
+house_type - тип дома
+housing_complex - название жк
+id - id на циане (тоже самое что cian_id)
+kitchen_area - площадь кузни
+latitude - гео. широта 
+living_area - жилая площадь
+longitude - гео. долгота
+passengers_elevator_number - количество пассажирских лифтов
+pic_urls - урлы фотографий
+porch_num - количество подъездов в доме
+price_per_house_in_dst - устаревший параметр
+price_per_house_in_dst_dynamics - устаревший параметр
+price_per_meter_in_dst - устаревший параметр
+price_per_meter_in_dst_dynamics - устаревший параметр
+price_per_sq_meter - цена за кв метр
+price_range - устаревший параметр
+purchase_dynamics - устаревший параметр
+purchase_price - устаревший параметр
+rent_dynamics - устаревший параметр
+rent_dynamics_in_dst - устаревший параметр
+rent_price - устаревший параметр
+rent_price_in_dst - устаревший параметр
+room1_square - площадь 1й комнаты
+room2_square - площадь 2й комнаты
+room3_square - площадь 3й комнаты
+seen_as_old - вспомогательный параметр, говорящий, было ли объявление в базе когда-то записано как устаревшее
+service_elevator_number - количество грузовых лифтов
+storey_number - какой этаж квартиры
+total_area - общая площадь
+total_number_views - общее количество просмотров объявления
+total_price - цена
+type_of_flat - вторичка/новостройка
+visitors - словарить с ключами - дата, значениями - количество просмотров в эту дату
+whole_storey_number - количество этажей в доме
+windows_to_street - выходят ли окна во двор
+сeiling_height - высота потолков
+trade_type - продажа/съем
