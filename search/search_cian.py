@@ -125,7 +125,7 @@ def parser(flat_string):
                     }
     return element_dict
     
-def crawler(page_id, page_num=None, stop_trying_treshhold=12):
+def crawler(page_id, stop_trying_treshhold=12):
     print('start crawler')
     time.sleep(1*random.random())
     stop_trying = 0
@@ -146,8 +146,7 @@ def crawler(page_id, page_num=None, stop_trying_treshhold=12):
             print('took time more than 5 mins')
             break
     print('time is ', str(time.process_time() - start_time))
-    if not page_num is None:
-        print('Ad with number: ' + str(page_num) + ' finished parsing.')
+    print('Ad with number: ' + str(page_id) + ' finished parsing.')
     
     ''' increment the global counter, do something with the input '''
 
