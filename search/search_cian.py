@@ -17,6 +17,7 @@ def crawler(page_id, tbb_dir=None, stop_trying_treshhold=12):
             break
         elif data==1:
             print('error occured on ' + str(stop_trying + 1) + ' attempt in ' + str(page_id))
+            #traceback.print_exc is for bebug
             # traceback.print_exc()
             stop_trying += 1
         else: 
