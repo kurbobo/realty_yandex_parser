@@ -10,7 +10,6 @@ import traceback
 import random
 import os
 
-tbb_dir = "/home/alex/Alex/big_data/tor-browser_en-US"
 def pars_price_range(browser):
     try:
         price_range = browser.find_element_by_css_selector('a.a10a3f92e9--price_range-link--3Kdo-').text
@@ -86,13 +85,6 @@ def pars_district_analytics(browser):
     except NoSuchElementException:
         price_per_m, price_per_m_dynamics, price_per_h, price_per_h_dynamics, rent_price, rent_dynamics = [None, None,None, None,None, None]
     return price_per_m, price_per_m_dynamics, price_per_h, price_per_h_dynamics, rent_price, rent_dynamics
-#for automatic getting of current initial_id
-import subprocess
-initial_id = int(subprocess.check_output(["./get_last_ad.sh"]))
-db_free = 1
-
-from datetime import datetime
-today_date = datetime.today().strftime('%Y-%m-%d')
 
 # print(initial_id)
 def parser(flat_string):
@@ -266,7 +258,16 @@ def download_data(page_id):
 
 if __name__=="__main__":
     import multiprocessing as mp
-    num_of_cores = mp.cpu_count()-2
+    import subprocess
+    from datetime import datetime
+    tbb_dir = "/home/alex/Alex/big_data/tor-browser_en-US"
+
+    #for automatic getting of current initial_id
+    initial_id = int(subprocess.check_output(["./get_last_ad.sh"]))
+    db_free = 1
+
+    today_date = datetime.today().strftime('%Y-%m-%d')
+    num_of_cores = 1#mp.cpu_count()-2
     print('Start execution with ' + str(num_of_cores) + ' cores.')
     pool = mp.Pool(num_of_cores)
     N = 500
