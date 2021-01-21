@@ -86,8 +86,7 @@ def pars_district_analytics(browser):
         price_per_m, price_per_m_dynamics, price_per_h, price_per_h_dynamics, rent_price, rent_dynamics = [None, None,None, None,None, None]
     return price_per_m, price_per_m_dynamics, price_per_h, price_per_h_dynamics, rent_price, rent_dynamics
 
-# print(initial_id)
-def parser(flat_string):
+def str_to_dict_parser(flat_string):
     element_dict = {'id': id_num_parser(flat_string),
                     'Number_of_rooms': number_of_rooms_parser(flat_string),
                     'housing_complex': housing_complex_parser(flat_string),
@@ -206,7 +205,7 @@ def download_data(page_id):
             for text in element_list:
                 output_file.write(text + '\n')
             output_file.write('-------------------------------------------------------------------------\n')
-            info_dict = parser(element_str)
+            info_dict = str_to_dict_parser(element_str)
             # print(info_dict)
             if info_dict['total_price'] is None and info_dict['address'] is None:
                 browser.quit()
