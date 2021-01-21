@@ -4,6 +4,7 @@ import random
 import os
 from parser_manage_tools import *
 import multiprocessing as mp
+
 import subprocess
     
 def crawler(page_id, tbb_dir=None, stop_trying_treshhold=12):
@@ -35,7 +36,6 @@ def crawler(page_id, tbb_dir=None, stop_trying_treshhold=12):
 if __name__=="__main__":
     #for automatic getting of current initial_id
     initial_id = int(subprocess.check_output(["./get_last_ad.sh"]))
-    db_free = 1
 
     # today_date = datetime.today().strftime('%Y-%m-%d')
     num_of_cores = 1#mp.cpu_count()-2
