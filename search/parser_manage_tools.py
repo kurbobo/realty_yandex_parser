@@ -6,6 +6,7 @@ import pymongo
 from state_dict_class import MyGlobals
 import datetime
 import time
+import random
 from parser_tools import *
 db_free = 1
 def str_to_dict_parser(flat_string):
@@ -107,7 +108,7 @@ def download_data(page_id, tbb_dir):
             stop_xvfb(xvfb_display)
             print('MyGlobals.state_dict[page_id] = 2')
             MyGlobals.state_dict[page_id] = 2
-            print('state_dict 2 is ', MyGlobals.state_dict)
+            # print('state_dict 2 is ', MyGlobals.state_dict)
             time.sleep(10*random.random())
             return 2
         info_dict['price_range'] = price_range
@@ -144,7 +145,7 @@ def download_data(page_id, tbb_dir):
         stop_xvfb(xvfb_display)
         print('MyGlobals.state_dict[page_id] = 0')
         MyGlobals.state_dict[page_id] = 0
-        print('state_dict 0 is ', MyGlobals.state_dict)
+        # print('state_dict 0 is ', MyGlobals.state_dict)
         return 0
 
     # except Exception as exception:
