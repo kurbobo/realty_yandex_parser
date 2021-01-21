@@ -11,7 +11,7 @@ import multiprocessing as mp
 from collections import Counter
     
 def crawler(page_id, tbb_dir=None, stop_trying_treshhold=12, loop=None):
-    print('start crawler')
+    # print('start crawler')
     time.sleep(1*random.random())
     if page_id not in MyGlobals.state_dict.keys():
         MyGlobals.state_dict[page_id] = None
@@ -36,5 +36,4 @@ if __name__=="__main__":
         print('Counter(MyGlobals.state_dict.values())[None] is ', Counter(MyGlobals.state_dict.values())[None])
         if Counter(MyGlobals.state_dict.values())[None]>N/4:
             loop.run_until_complete(asyncio.gather(*asyncio.Task.all_tasks(loop), return_exceptions=True))   
-    # print('Parsing is done!!!')
 
