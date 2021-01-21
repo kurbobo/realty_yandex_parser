@@ -2,6 +2,7 @@ import re
 from geopy.geocoders import Nominatim
 import datetime
 from datetime import timedelta
+from selenium.common.exceptions import NoSuchElementException
 
 correct_building_name = ['address:\n', 'р-н ', 'На карте', 'дор. ', 'просп.', 'ул.', 'наб.', 'ш.', 'пер.']
 
@@ -430,3 +431,73 @@ def rent_or_sale_parser(flat_string):
 				return 'rent_short'
 		return None
 # print(rent_or_sale_parser('Недвижимость в Санкт-ПетербургеАрендаАренда 2-комнатных квартир \n'))
+def pars_price_range(browser):
+    try:
+        price_range = browser.find_element_by_css_selector('a.a10a3f92e9--price_range-link--3Kdo-').text
+        price_range = removeNonAscii(str(price_range))
+        k_max=0
+        for k in range(len(price_range),1,-1):
+            if k*' ' in price_range:
+                k_max = k
+                break
+        price_range = price_range.split(k_max*' ')
+        price_range = list(map(lambda x: int(x.replace(' ', '')), price_range))
+    except NoSuchElementException:
+            price_range = None
+    return price_range
+
+def pars_house_analytics(browser):
+    try:
+        header = browser.find_element_by_css_selector("div.a10a3f92e9--averages--3nUh3")
+        house = header.find_elements_by_css_selector("div.a10a3f92e9--wrapper--2U64R")[0]
+        price, rent = house.find_elements_by_css_selector("div.a10a3f92e9--average--ITlDQ")
+
+        price_list = list(map(lambda x: removeNonAscii(str(x.text.replace(' ', ''))), price.find_elements_by_css_selector('*')))
+        price_list = list(filter(lambda a: a != '', price_list))
+        for i in price_list:
+            if not re.search(r'%\d+', i) is None and i in price_list:
+                price_list.remove(i)
+        price_list = list(map(lambda x: float(x.replace('%', '').replace(',', '.')),price_list))
+        purchase_price, purchase_dynamics = price_list
+        rent = list(map(lambda x: removeNonAscii(str(x.text.replace(' ', ''))), rent.find_elements_by_css_selector('*')))
+        rent_list = []
+        rent = list(filter(lambda a: a != '', rent))
+        for i in rent:
+            if re.search(r'%\d+', i) is None and '.' not in i:
+                rent_list.append(i)
+        rent_price, rent_dynamics = list(map(lambda x: float(x.replace('%', '').replace(',', '.').replace('/', '')),rent_list))
+    except NoSuchElementException:
+        purchase_price, purchase_dynamics, rent_price, rent_dynamics = [None, None,None, None]
+    return purchase_price, purchase_dynamics, rent_price, rent_dynamics
+
+def pars_district_analytics(browser):
+    try:
+        header = browser.find_element_by_css_selector("div.a10a3f92e9--averages--3nUh3")
+        house = header.find_elements_by_css_selector("div.a10a3f92e9--wrapper--2U64R")[1]
+        price_per_m, price_per_h, month_rent = house.find_elements_by_css_selector("div.a10a3f92e9--average--ITlDQ")
+
+        price_per_m_list = list(map(lambda x: removeNonAscii(str(x.text.replace(' ', ''))), price_per_m.find_elements_by_css_selector('*')))
+        price_per_m_list = list(filter(lambda a: a != '', price_per_m_list))
+        for i in price_per_m_list:
+            if not re.search(r'%\d+', i) is None and i in price_per_m_list:
+                price_per_m_list.remove(i)
+        price_per_m_list = list(map(lambda x: float(x.replace('%', '').replace(',', '.')),price_per_m_list))
+        price_per_m, price_per_m_dynamics = price_per_m_list
+
+        price_per_h_list = list(map(lambda x: removeNonAscii(str(x.text.replace(' ', ''))), price_per_h.find_elements_by_css_selector('*')))
+        price_per_h_list = list(filter(lambda a: a != '' and re.search(r'%\d+', a) is None and not '.' in a, price_per_h_list))
+        price_per_h_list = list(map(lambda x: float(x.replace('%', '').replace(',', '.')),price_per_h_list))
+        price_per_h, price_per_h_dynamics = price_per_h_list
+        
+        
+        
+        month_rent = list(map(lambda x: removeNonAscii(str(x.text.replace(' ', ''))), month_rent.find_elements_by_css_selector('*')))
+        rent_list = []
+        month_rent = list(filter(lambda a: a != '', month_rent))
+        for i in month_rent:
+            if re.search(r'%\d+', i) is None and '.' not in i:
+                rent_list.append(i)
+        rent_price, rent_dynamics = list(map(lambda x: float(x.replace('%', '').replace(',', '.').replace('/', '')),rent_list))
+    except NoSuchElementException:
+        price_per_m, price_per_m_dynamics, price_per_h, price_per_h_dynamics, rent_price, rent_dynamics = [None, None,None, None,None, None]
+    return price_per_m, price_per_m_dynamics, price_per_h, price_per_h_dynamics, rent_price, rent_dynamics
