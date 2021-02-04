@@ -31,8 +31,6 @@ class Crawler(object):
         print('Ad with number: ' + str(self.page_id) + ' finished parsing.')
     def download_data(self):
         today_date = datetime.datetime.today().strftime('%Y-%m-%d')
-        # print('start download_data')
-        # try:
         with open('/home/alex/Alex/big_data/realty_parser/ads_texts/'+ str(self.page_id) + '.txt', 'a', encoding='utf-8') as output_file:
             xvfb_display = start_xvfb()
             # browser = webdriver.Chrome(options=chrome_options)
