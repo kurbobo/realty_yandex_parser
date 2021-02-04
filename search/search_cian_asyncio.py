@@ -82,13 +82,10 @@ class Crawler(object):
                 output_file.write(text + '\n')
             output_file.write('-------------------------------------------------------------------------\n')
             info_dict = str_to_dict_parser(element_str)
-            # print(info_dict)
             if info_dict['total_price'] is None and info_dict['address'] is None:
                 browser.quit()
                 stop_xvfb(xvfb_display)
-                print('MyGlobals.state_dict[self.page_id] = 2')
                 MyGlobals.state_dict[self.page_id] = 2
-                # print('state_dict 2 is ', MyGlobals.state_dict)
                 time.sleep(10*random.random())
                 return 2
             info_dict['price_range'] = price_range
@@ -123,7 +120,6 @@ class Crawler(object):
             connect.close()
             browser.quit()
             stop_xvfb(xvfb_display)
-            print('MyGlobals.state_dict[page_id] = 0')
             MyGlobals.state_dict[self.page_id] = 0
             return 0
 if __name__=="__main__":
@@ -139,7 +135,6 @@ if __name__=="__main__":
         crawler = Crawler(initial_id + ad, tbb_dir = "/home/alex/Alex/big_data/tor-browser_en-US", loop=loop)
         crawler()
     for _ in range(4):
-        print('Counter(MyGlobals.state_dict.values())[None] is ', Counter(MyGlobals.state_dict.values())[None])
         if Counter(MyGlobals.state_dict.values())[None]>N/4:
             loop.run_until_complete(asyncio.gather(*asyncio.Task.all_tasks(loop), return_exceptions=True))   
 
