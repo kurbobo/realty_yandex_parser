@@ -17,7 +17,7 @@ class Crawler(object):
     we should start crawling
     :param tbb_dir: string, the path to the tor-browser
     :param stop_trying_treshhold: integer, must be positive. The number of attempts to parse single page
-    :return: integer
+    :return: None
     """
     def __call__(self, page_id, tbb_dir=None, stop_trying_treshhold=12, loop=None):
         time.sleep(1*random.random())
