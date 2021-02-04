@@ -2,6 +2,7 @@ import time
 import traceback
 import random
 import os
+import sys
 from parser_manage_tools import *
 import asyncio
 from concurrent.futures.thread import ThreadPoolExecutor
@@ -31,13 +32,12 @@ if __name__=="__main__":
     state_dict = {}
     N = 500
     executor = ThreadPoolExecutor(mp.cpu_count() * 2)
-    tbb_dir = "/home/alex/Alex/big_data/tor-browser_en-US"
     loop = asyncio.get_event_loop()
     for ad in range(N):#100000
         if ad>=N-10:
             break
         crawler = Crawler()
-        crawler(initial_id + ad, tbb_dir, loop=loop)
+        crawler(initial_id + ad, tbb_dir = "/home/alex/Alex/big_data/tor-browser_en-US", loop=loop)
     for _ in range(4):
         print('Counter(MyGlobals.state_dict.values())[None] is ', Counter(MyGlobals.state_dict.values())[None])
         if Counter(MyGlobals.state_dict.values())[None]>N/4:
